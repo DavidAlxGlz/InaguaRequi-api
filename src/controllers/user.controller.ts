@@ -14,7 +14,6 @@ const comparePassword = async (password:any,recivedPassword:any)=>{
 }
 
 export const signUp = async (req:Request,res:Response):Promise<Response> =>{
-    
     if(!req.body.usuario || !req.body.password){
         return res.status(400).json({ msg: 'Envia toda la informacion' })
     }
@@ -22,13 +21,13 @@ export const signUp = async (req:Request,res:Response):Promise<Response> =>{
     const usuarioT = req.body.usuario;
     const us:any = await conn.query('select * from usuarios where usuario = ?',[usuarioT])
     if(us[0].length > 0){ return res.status(400).json('El usuario ya existe ok' ) }
-                const user = us[0][0];
-                const passEncrypt = await encryptPassword(req.body.password);
-                const reqUser = req.body;
-                reqUser.password = passEncrypt;
-                const insertUser =  await conn.query('INSERT INTO inagua_requis.usuarios (idUsuarios,usuario,password,nombre,apellido,Roles_idRoles)VALUES(default,?,?,?,?,?)',[reqUser.usuario,reqUser.password,reqUser.nombre,reqUser.apellido,reqUser.rolesIdRoles])
-                conn.end()
-                return res.send(insertUser)
+    const user = us[0][0];
+    const passEncrypt = await encryptPassword(req.body.password);
+    const reqUser = req.body;
+    reqUser.password = passEncrypt;
+    const insertUser =  await conn.query('INSERT INTO inagua_requis.usuarios (idUsuarios,usuario,password,nombre,apellido,Roles_idRoles)VALUES(default,?,?,?,?,?)',[reqUser.usuario,reqUser.password,reqUser.nombre,reqUser.apellido,reqUser.rolesIdRoles])
+    conn.end()
+    return res.send(insertUser)
 }
 
 
@@ -40,8 +39,6 @@ export const signIn = async (req:Request,res:Response):Promise<Response> =>{
     const usuarioT = req.body.usuario;
     const us:any = await conn.query('select * from usuarios where usuario = ?',[usuarioT])
     const user = us[0][0];
-    console.log(user.usuario)
-
     if(!user){
         return res.status(400).json({msg:'el usuario no existe'})
     }

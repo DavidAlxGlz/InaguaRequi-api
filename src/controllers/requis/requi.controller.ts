@@ -1,6 +1,8 @@
 import { connect } from '../../database';
 import {Request,Response} from 'express';
-import Connection from 'mysql2/typings/mysql/lib/Connection';
+import jwt from "jsonwebtoken";
+import config from '../../config';
+
 
 
 export const createRequi=async(req:Request,res:Response):Promise<Response>=>{
@@ -16,7 +18,6 @@ export const createRequi=async(req:Request,res:Response):Promise<Response>=>{
         console.log(response, meta);
         await conn.query("INSERT INTO unidades (idUnidades,unidad) values(default,'nuevo1sst')");
         await conn.query("INSERT INTO unidades (idUnidades,unidad) values(1,'nuevo2sst')");
-
         await conn.commit();
         return res.send('')
       } catch (error) {
@@ -26,4 +27,23 @@ export const createRequi=async(req:Request,res:Response):Promise<Response>=>{
       } finally {
         if (conn) await conn.release();
       }
+}
+
+export const infoUsuario =async(req:Request,res:Response)=>{
+  try {
+      const toke = req.headers["x-access-token"]?.toString();  
+      if(!toke) return res.status(403).json({ message: "sin token" })
+      const decoded:any = jwt.verify(toke,config.SECRET);
+      if(!decoded) return res.status(404).json({ message:' token invalido '})
+      const conn = await connect()
+      const idUsuario = decoded.id;
+      const us:any = await conn.query('select nombre,apellido,centroCosto,Departamentos_idDepartamentos,Direcciones_idDirecciones from usuarios inner join centrocosto on usuarios.CentroCosto_idCentroCosto = centrocosto.idCentroCosto where usuarios.idUsuarios = ?',[idUsuario])
+      const {nombre,apellido,centroCosto,Departamentos_idDepartamentos,Direcciones_idDirecciones} = us[0][0];
+      //if(!user){
+      //   return res.status(400).json({msg:'el usuario no existe'})
+      // }
+     res.status(200).json({nombre,apellido,centroCosto})
+  } catch (error) {
+      return res.status(401).json({ message: 'no autorizado' })
+  }
 }
