@@ -37,8 +37,8 @@ export const infoUsuario =async(req:Request,res:Response)=>{
       if(!decoded) return res.status(404).json({ message:' token invalido '})
       const conn = await connect()
       const idUsuario = decoded.id;
-      const us:any = await conn.query('select nombre,apellido,centroCosto,Departamentos_idDepartamentos,Direcciones_idDirecciones from usuarios inner join centrocosto on usuarios.CentroCosto_idCentroCosto = centrocosto.idCentroCosto where usuarios.idUsuarios = ?',[idUsuario])
-      const {nombre,apellido,centroCosto,Departamentos_idDepartamentos,Direcciones_idDirecciones} = us[0][0];
+      const UserSelect:any = await conn.query('select nombre,apellido,centroCosto,Departamentos_idDepartamentos,Direcciones_idDirecciones from usuarios inner join centrocosto on usuarios.CentroCosto_idCentroCosto = centrocosto.idCentroCosto where usuarios.idUsuarios = ?',[idUsuario])
+      const {nombre,apellido,centroCosto,Departamentos_idDepartamentos,Direcciones_idDirecciones} = UserSelect[0][0];
       //if(!user){
       //   return res.status(400).json({msg:'el usuario no existe'})
       // }
