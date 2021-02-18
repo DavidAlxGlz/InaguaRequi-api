@@ -37,12 +37,13 @@ export const infoUsuario =async(req:Request,res:Response)=>{
       if(!decoded) return res.status(404).json({ message:' token invalido '})
       const conn = await connect()
       const idUsuario = decoded.id;
-      const UserSelect:any = await conn.query('select nombre,apellido,centroCosto,Departamentos_idDepartamentos,Direcciones_idDirecciones from usuarios inner join centrocosto on usuarios.CentroCosto_idCentroCosto = centrocosto.idCentroCosto where usuarios.idUsuarios = ?',[idUsuario])
-      const {nombre,apellido,centroCosto,Departamentos_idDepartamentos,Direcciones_idDirecciones} = UserSelect[0][0];
-      //if(!user){
-      //   return res.status(400).json({msg:'el usuario no existe'})
-      // }
-     res.status(200).json({nombre,apellido,centroCosto})
+      const UserSelect:any = await conn.query('SELECT nombre,apellido,Roles_idRoles,rol,centroCosto,departamentos.departamento,direcciones.direccion FROM usuarios INNER JOIN centrocosto ON usuarios.CentroCosto_idCentroCosto = centrocosto.idCentroCosto INNER JOIN roles ON usuarios.Roles_idroles = roles.idroles INNER JOIN direcciones ON direcciones.idDirecciones = centroCosto.Direcciones_idDirecciones INNER JOIN departamentos ON departamentos.idDepartamentos = centroCosto.Departamentos_idDepartamentos WHERE usuarios.idUsuarios = ?;',[idUsuario])
+      if(!UserSelect){
+         return res.status(400).json({msg:'el usuario no existe'})
+      }
+      console.log(UserSelect[0][0])
+      const {nombre,apellido,centroCosto,rol,departamento,direccion} = UserSelect[0][0];
+     res.status(200).json({nombre,apellido,centroCosto,rol,departamento,direccion})
   } catch (error) {
       return res.status(401).json({ message: 'no autorizado' })
   }
