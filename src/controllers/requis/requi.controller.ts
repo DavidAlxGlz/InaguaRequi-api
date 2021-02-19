@@ -37,7 +37,7 @@ export const createRequi=async(req:Request,res:Response):Promise<Response>=>{
       } finally {
        /* if (conn) await conn.release(); */
       }
-    return res.status(200)
+    return res.status(200).json({ "mensaje":"x"})
 }
 
 export const infoUsuario =async(req:Request,res:Response)=>{
