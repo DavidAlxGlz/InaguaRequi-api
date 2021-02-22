@@ -64,13 +64,14 @@ export const infoUsuario =async(req:Request,res:Response)=>{
     }
 }
 
+
+
 export const showRequis =async(req:Request,res:Response):Promise<Response>=>{
   try {
       const conn = await connect();
       const requis = await conn.query('SELECT idRequisiciones,fecha,justificacion,nombre,apellido,departamento,direccion,centroCosto FROM inagua_requis.requisiciones inner join usuarios on usuarios.idUsuarios = requisiciones.Usuarios_idUsuarios inner join centrocosto on centroCosto.idCentroCosto = requisiciones.CentroCosto_idCentroCosto inner join departamentos on departamentos.idDepartamentos = centroCosto.Departamentos_idDepartamentos inner join direcciones on direcciones.idDirecciones = centroCosto.Direcciones_idDirecciones order by idRequisiciones desc;');
-      
+      conn.end()
      return res.status(200).json(requis[0])
-     conn.end()
     } catch (error) {
       return res.status(401).json({ message: 'no autorizado' }) 
     }
@@ -81,7 +82,7 @@ export const showRequiById =async(req:Request,res:Response):Promise<Response>=>{
   const idRequi = req.body.idRequi;
   try {
     const conn = await connect();
-    const requi = await conn.query('SELECT * from requisiciones where idRequisiciones = ?',[idRequi]);
+    const requi = await conn.query('SELECT idRequisiciones,fecha,justificacion,nombre,apellido,centroCosto,departamento,direccion FROM inagua_requis.requisiciones inner join usuarios on usuarios.idUsuarios = requisiciones.Usuarios_idUsuarios inner join centrocosto on centrocosto.idCentroCosto = requisiciones.CentroCosto_idCentroCosto inner join departamentos on departamentos.idDepartamentos = centroCosto.Departamentos_idDepartamentos inner join direcciones on direcciones.idDirecciones = centroCosto.Direcciones_idDirecciones where requisiciones.idRequisiciones = ?',[idRequi]);
     conn.end()
    return res.status(200).json(requi[0])
   } catch (error) {
@@ -95,7 +96,7 @@ export const showMovimientosById = async(req:Request,res:Response):Promise<Respo
   console.log(idRequi)
   try {
     const con = await connect();
-    const movs = await con.query('SELECT idMovimiento,descripcion,cantidad,Unidades_idUnidades from movimiento inner join movimiento_has_requisiciones on movimiento_has_requisiciones.Movimiento_idMovimiento = movimiento.idMovimiento where movimiento_has_requisiciones.Requisiciones_idRequisiciones = ?',[idRequi]);
+    const movs = await con.query('SELECT idMovimiento,descripcion,cantidad,unidad from movimiento inner join movimiento_has_requisiciones on movimiento_has_requisiciones.Movimiento_idMovimiento = movimiento.idMovimiento inner join unidades on unidades.idUnidades = movimiento.Unidades_idUnidades where movimiento_has_requisiciones.Requisiciones_idRequisiciones = ?',[idRequi]);
     con.end();
     return res.status(200).json(movs[0])
   } catch (error) {
