@@ -52,3 +52,18 @@ export const signIn = async (req:Request,res:Response):Promise<Response> =>{
    
     return res.json({token})
 }
+
+export const getRolByToken=async(req:Request,res:Response):Promise<Response>=>{
+    try {
+        const token = req.headers['x-access-token']?.toLocaleString();
+        if(!token) return res.status(403).json({ message: "sin token" })
+        const decoded:any = jwt.verify(token,config.SECRET);
+        if(!decoded) return res.status(404).json({ message:' token invalido ' })
+        const conn = await connect();
+        const getRol = await conn.query('Select Roles_idRoles from usuarios where idUsuarios = ?',[decoded.id]);
+        conn.end()
+        return res.status(200).json(getRol[0]);
+    } catch (error) {
+        return res.status(200).json({ msg: "mensaje"})
+    }
+}
