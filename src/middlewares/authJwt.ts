@@ -19,6 +19,7 @@ if(!decoded) return res.status(404).json({ message:' token invalido ' })
     const user = us[0]
 if (user.length === 0) return res.status(404).json({ message: 'usuario no encontrado' })
 Rol = user[0].rolesIdRoles;
+conn.end()
 next()
 } catch (error) {
     return res.status(401).json({ message: 'No autorizado' })

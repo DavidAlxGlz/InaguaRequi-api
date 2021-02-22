@@ -24,8 +24,9 @@ export const signUp = async (req:Request,res:Response):Promise<Response> =>{
     const user = us[0][0];
     const passEncrypt = await encryptPassword(req.body.password);
     const reqUser = req.body;
+    console.log(reqUser)
     reqUser.password = passEncrypt;
-    const insertUser =  await conn.query('INSERT INTO inagua_requis.usuarios (idUsuarios,usuario,password,nombre,apellido,Roles_idRoles)VALUES(default,?,?,?,?,?)',[reqUser.usuario,reqUser.password,reqUser.nombre,reqUser.apellido,reqUser.rolesIdRoles])
+    const insertUser =  await conn.query('INSERT INTO inagua_requis.usuarios (idUsuarios,usuario,password,nombre,apellido,Roles_idRoles,CentroCosto_idCentroCosto)VALUES(default,?,?,?,?,?,?)',[reqUser.usuario,reqUser.password,reqUser.nombre,reqUser.apellido,reqUser.Roles_idRoles,reqUser.CentroCosto_idCentroCosto])
     conn.end()
     return res.send(insertUser)
 }
@@ -47,6 +48,7 @@ export const signIn = async (req:Request,res:Response):Promise<Response> =>{
     const token = jwt.sign({ id: user.idUsuarios }, config.SECRET,{
         expiresIn:28800 //8 horas
     })
+    conn.end()
    
     return res.json({token})
 }
