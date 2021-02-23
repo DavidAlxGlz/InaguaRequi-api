@@ -96,7 +96,7 @@ export const showMovimientosById = async(req:Request,res:Response):Promise<Respo
   console.log(idRequi)
   try {
     const con = await connect();
-    const movs = await con.query('SELECT idMovimiento,descripcion,cantidad,unidad from movimiento inner join movimiento_has_requisiciones on movimiento_has_requisiciones.Movimiento_idMovimiento = movimiento.idMovimiento inner join unidades on unidades.idUnidades = movimiento.Unidades_idUnidades where movimiento_has_requisiciones.Requisiciones_idRequisiciones = ?',[idRequi]);
+    const movs = await con.query('SELECT idMovimiento,descripcion,cantidad,Unidades_idUnidades from movimiento inner join movimiento_has_requisiciones on movimiento_has_requisiciones.Movimiento_idMovimiento = movimiento.idMovimiento where movimiento_has_requisiciones.Requisiciones_idRequisiciones = ?',[idRequi]);
     con.end();
     return res.status(200).json(movs[0])
   } catch (error) {

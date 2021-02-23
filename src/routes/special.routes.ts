@@ -13,7 +13,7 @@ router.post('/showRequiById',showRequiById)
 router.post('/showMovimientosById',showMovimientosById)
 router.post('/getRolByToken',getRolByToken)
 router.get('/infoUsuario',infoUsuario)
-router.get('/infoUnidades',infoUnidades)
+//router.get('/infoUnidades',infoUnidades)
 router.get('/showRequis',showRequis)
 
 export default router;
