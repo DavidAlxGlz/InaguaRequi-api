@@ -2,7 +2,6 @@ import { connect } from '../../database';
 import {Request,Response} from 'express';
 import jwt from "jsonwebtoken";
 import config from '../../config';
-import Pool from 'mysql2/typings/mysql/lib/Pool';
 
 
 
@@ -77,6 +76,39 @@ export const showRequis =async(req:Request,res:Response):Promise<Response>=>{
     }
 }
 
+//ver todas las requisiciones de un usuario
+export const showRequisByUser =async(req:Request,res:Response):Promise<Response>=>{
+  try {
+    const toke = req.headers["x-access-token"]?.toString();
+    if(!toke) return res.status(403).json({ message: "sin token" })
+    const decoded:any = jwt.verify(toke,config.SECRET);
+    if(!decoded) return res.status(404).json({ message:' token invalido ' })
+    const conn = await connect();
+    const requis = await conn.query('SELECT idRequisiciones,fecha,justificacion,nombre,apellido,departamento,direccion,centroCosto FROM inagua_requis.requisiciones inner join usuarios on usuarios.idUsuarios = requisiciones.Usuarios_idUsuarios inner join centrocosto on centroCosto.idCentroCosto = requisiciones.CentroCosto_idCentroCosto inner join departamentos on departamentos.idDepartamentos = centroCosto.Departamentos_idDepartamentos inner join direcciones on direcciones.idDirecciones = centroCosto.Direcciones_idDirecciones where usuarios.idUsuarios = ? order by idRequisiciones desc;',[decoded.id])
+    conn.end()
+    return res.status(200).json(requis[0])
+  } catch (error) {
+    return res.status(401).json(error)
+  }
+} 
+
+//ver todas las requisiciones del departamento segun usuario
+export const showRequisByDepartamentoUsuario =async(req:Request,res:Response):Promise<Response>=>{
+  try {
+    const toke = req.headers["x-access-token"]?.toString();
+    if(!toke) return res.status(403).json({ message: "sin token" })
+    const decoded:any = jwt.verify(toke,config.SECRET);
+    if(!decoded) return res.status(404).json({ message:' token invalido ' })
+    const conn = await connect();
+    const requis = await conn.query('SELECT idRequisiciones,fecha,justificacion,nombre,apellido,departamento,direccion,centroCosto  FROM inagua_requis.requisiciones inner join usuarios on usuarios.idUsuarios = requisiciones.Usuarios_idUsuarios inner join centrocosto on centroCosto.idCentroCosto = requisiciones.CentroCosto_idCentroCosto inner join departamentos on departamentos.idDepartamentos = centroCosto.Departamentos_idDepartamentos inner join direcciones on direcciones.idDirecciones = centroCosto.Direcciones_idDirecciones where departamentos.idDepartamentos in (select  Departamentos_idDepartamentos from usuarios inner join centrocosto on centroCosto.idCentroCosto = usuarios.CentroCosto_idCentroCosto where usuarios.idUsuarios = ?) order by idRequisiciones desc;',[decoded.id])
+    conn.end()
+    return res.status(200).json(requis[0])
+  } catch (error) {
+    return res.status(401).json(error)
+  }
+} 
+
+//ver una sola requisicion por id
 export const showRequiById =async(req:Request,res:Response):Promise<Response>=>{
   if(!req.body){ res.status(400).json({msg: 'envia toda la informacion'})}
   const idRequi = req.body.idRequi;
@@ -93,7 +125,6 @@ export const showRequiById =async(req:Request,res:Response):Promise<Response>=>{
 export const showMovimientosById = async(req:Request,res:Response):Promise<Response>=>{
   if(!req.body){ res.status(400).json({msg: 'envia toda la informacion'})}
   const idRequi = req.body.idRequi;
-  console.log(idRequi)
   try {
     const con = await connect();
     const movs = await con.query('SELECT idMovimiento,descripcion,cantidad,Unidades_idUnidades from movimiento inner join movimiento_has_requisiciones on movimiento_has_requisiciones.Movimiento_idMovimiento = movimiento.idMovimiento where movimiento_has_requisiciones.Requisiciones_idRequisiciones = ?',[idRequi]);

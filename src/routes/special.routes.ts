@@ -3,8 +3,7 @@ import {Router} from 'express';
 const router = Router();
 
 import {  signUp,getRolByToken } from "../controllers/user.controller";
-import { createRequi,infoUsuario,showRequis,showRequiById, showMovimientosById } from "../controllers/requis/requi.controller";
-import { infoUnidades } from "../controllers/requis/infoUnidades.controller";
+import { createRequi,infoUsuario,showRequis,showRequiById, showMovimientosById, showRequisByUser } from "../controllers/requis/requi.controller";
 import { authJwt } from "../middlewares";
 
 router.post('/signup', authJwt.verifyToken,authJwt.isModerator,signUp);
@@ -15,6 +14,8 @@ router.post('/getRolByToken',getRolByToken)
 router.get('/infoUsuario',infoUsuario)
 //router.get('/infoUnidades',infoUnidades)
 router.get('/showRequis',showRequis)
+router.get('/showRequisByUser',showRequisByUser)
+router.get('/showRequisByDepartamentoUsuario',showRequisByUser)
 
 export default router;
 
