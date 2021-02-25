@@ -94,6 +94,7 @@ export const showRequisByUser =async(req:Request,res:Response):Promise<Response>
 
 //ver todas las requisiciones del departamento segun usuario
 export const showRequisByDepartamentoUsuario =async(req:Request,res:Response):Promise<Response>=>{
+  console.log('sientra')
   try {
     const toke = req.headers["x-access-token"]?.toString();
     if(!toke) return res.status(403).json({ message: "sin token" })
