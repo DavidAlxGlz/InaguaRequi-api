@@ -32,6 +32,7 @@ export const createRequi=async(req:Request,res:Response):Promise<Response>=>{
        })
         await conn.commit();
         pool.end()
+        console.log(requi)
         return res.status(200).json(requi)
       } catch (error) {
         if (conn) await conn.rollback();

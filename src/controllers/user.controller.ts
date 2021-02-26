@@ -33,7 +33,7 @@ export const signUp = async (req:Request,res:Response):Promise<Response> =>{
 
 export const signIn = async (req:Request,res:Response):Promise<Response> =>{
     if(!req.body.usuario || !req.body.password){
-        return res.status(400).json({ msg: 'envia toda la informacion' })
+        return res.status(400).json({ msg: 'Envia toda la información' })
     }
 
     const conn = await connect()
@@ -41,11 +41,11 @@ export const signIn = async (req:Request,res:Response):Promise<Response> =>{
     const us:any = await conn.query('select * from usuarios where usuario = ?',[usuarioT])
     const user = us[0][0];
     if(!user){
-        return res.status(400).json({msg:'el usuario no existe'})
+        return res.status(401).json({msg:'Usuario o contraseña inválidos'})
     }
 
     const matchPassword = await comparePassword(req.body.password ,user.password)
-    if(!matchPassword) return res.status(401).json({ token: null, msg:'Contrasena invalida' })
+    if(!matchPassword) return res.status(401).json({ token: null, msg:'Usuario o contraseña inválidos' })
     const token = jwt.sign({ id: user.idUsuarios }, config.SECRET,{
         expiresIn:28800 //8 horas
     })
