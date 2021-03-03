@@ -27,6 +27,7 @@ export const createRequi=async(req:Request,res:Response):Promise<Response>=>{
         const idNuevaRequi = requi[0].insertId;
         movimientos.map(async(requi:any,index:number)=>{
          const movi = await conn.query('INSERT INTO movimiento (idMovimiento,descripcion,cantidad,Unidades_idUnidades) values(default,?,?,?)',[requi.descripcion,requi.cantidad,requi.unidades]);
+        //cambiar por select para obtener el id de la requi creada
          const idMov = movi[0].insertId;
          await conn.query('INSERT INTO movimiento_has_requisiciones (Movimiento_idMovimiento,Requisiciones_idRequisiciones) values(?,?)',[idMov,idNuevaRequi]);
        })
@@ -65,7 +66,7 @@ export const infoUsuario =async(req:Request,res:Response)=>{
 }
 
 
-
+//ver todas las requisiciones
 export const showRequis =async(req:Request,res:Response):Promise<Response>=>{
   try {
       const conn = await connect();
@@ -117,7 +118,7 @@ export const showRequiById =async(req:Request,res:Response):Promise<Response>=>{
   const idRequi = req.body.idRequi;
   try {
     const conn = await connect();
-    const requi = await conn.query('SELECT idRequisiciones,fecha,justificacion,usuarios.nombre,usuarios.apellido,centroCosto,departamento,direccion,directores.nombre as nombreDirector, directores.apellido as apellidoDirector FROM inagua_requis.requisiciones inner join usuarios on usuarios.idUsuarios = requisiciones.Usuarios_idUsuarios inner join centrocosto on centrocosto.idCentroCosto = requisiciones.CentroCosto_idCentroCosto inner join departamentos on departamentos.idDepartamentos = centroCosto.Departamentos_idDepartamentos inner join directores on directores.idDirectores = requisiciones.Directores_idDirectores inner join direcciones on direcciones.idDirecciones = centroCosto.Direcciones_idDirecciones where requisiciones.idRequisiciones = ?',[idRequi]);
+    const requi = await conn.query('SELECT idRequisiciones,fecha,justificacion,usuarios.nombre,usuarios.apellido,centroCosto,departamento,direccion,directores.nombre as nombreDirector, directores.apellido as apellidoDirector,bienesOServicios FROM inagua_requis.requisiciones inner join usuarios on usuarios.idUsuarios = requisiciones.Usuarios_idUsuarios inner join centrocosto on centrocosto.idCentroCosto = requisiciones.CentroCosto_idCentroCosto inner join departamentos on departamentos.idDepartamentos = centroCosto.Departamentos_idDepartamentos inner join directores on directores.idDirectores = requisiciones.Directores_idDirectores inner join direcciones on direcciones.idDirecciones = centroCosto.Direcciones_idDirecciones where requisiciones.idRequisiciones = ?',[idRequi]);
     conn.end()
    return res.status(200).json(requi[0])
   } catch (error) {
