@@ -17,15 +17,21 @@ export const createVale =async(req:Request,res:Response):Promise<Response>=>{
     const arr = req.body;
     const conn = await pool.getConnection();
     await conn.beginTransaction();
-    const vale:any = await conn.query('INSERT INTO vales(idVales,Proveedores_idProveedor,Requisiciones_idRequisiciones,fecha,autoriza_idUsuarios) values(default,?,?,?.?)',[]);
+    const vale:any = await conn.query('INSERT INTO vales(idVales,Proveedores_idProveedor,Requisiciones_idRequisiciones,fecha,autoriza_idUsuarios) values(default,?,?,?.?)',[arr.Proveedores_idProveedor,arr.Requisiciones_idRequisiciones,arr.fecha,decoded.id]);
     //cambiar por select para obtener el id del vale creado
     const idNuevoVale = vale[0].insertId
     const movimientos = arr.movimientos;
-    movimientos.map(async(vale:any,index:number)=>{
-        await conn.query('INSERT INTO vales_has_movimiento () values()')
+    movimientos.map(async(mov:any,index:number)=>{
+    //update movimientos | Vales_idVales
+        await conn.query('UPDATE movimiento set Vales_idVales = ? where idMovimiento = ?',[idNuevoVale,mov.idMovimiento])
     })
-    return res.status(200).json({msg:""})
+    await conn.commit();
+    pool.end();
+    return res.status(200).json(vale)
     } catch (error) {
-       return  res.status(200).json({msg:""})
+        if (conn) await conn.rollback();
+        pool.end();
+        return res.send(error)
+        throw error;
     }
 }

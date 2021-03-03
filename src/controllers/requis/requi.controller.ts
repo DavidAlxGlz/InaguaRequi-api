@@ -24,12 +24,11 @@ export const createRequi=async(req:Request,res:Response):Promise<Response>=>{
         const idCC = CC[0][0].idCentroCosto;
         await conn.beginTransaction();
         const requi:any = await conn.query(`INSERT INTO requisiciones(idRequisiciones,fecha,justificacion,Usuarios_idUsuarios,CentroCosto_idCentroCosto,Directores_idDirectores,bienesOServicios) values(default,?,?,?,?,?,?)`,[arr.fecha,arr.justificacion,decoded.id,idCC,arr.Directores_idDirectores,arr.bienesOServicios]);
+        //cambiar por select para obtener el id de la requi creada
         const idNuevaRequi = requi[0].insertId;
         movimientos.map(async(requi:any,index:number)=>{
-         const movi = await conn.query('INSERT INTO movimiento (idMovimiento,descripcion,cantidad,Unidades_idUnidades) values(default,?,?,?)',[requi.descripcion,requi.cantidad,requi.unidades]);
-        //cambiar por select para obtener el id de la requi creada
-         const idMov = movi[0].insertId;
-         await conn.query('INSERT INTO movimiento_has_requisiciones (Movimiento_idMovimiento,Requisiciones_idRequisiciones) values(?,?)',[idMov,idNuevaRequi]);
+         const movi = await conn.query('INSERT INTO movimiento (idMovimiento,descripcion,cantidad,Unidades_idUnidades,Requisiciones_idRequisiciones) values(default,?,?,?,?)',[requi.descripcion,requi.cantidad,requi.unidades,idNuevaRequi]);
+         
        })
         await conn.commit();
         pool.end()
@@ -131,7 +130,7 @@ export const showMovimientosById = async(req:Request,res:Response):Promise<Respo
   const idRequi = req.body.idRequi;
   try {
     const con = await connect();
-    const movs = await con.query('SELECT idMovimiento,descripcion,cantidad,Unidades_idUnidades from movimiento inner join movimiento_has_requisiciones on movimiento_has_requisiciones.Movimiento_idMovimiento = movimiento.idMovimiento where movimiento_has_requisiciones.Requisiciones_idRequisiciones = ?',[idRequi]);
+    const movs = await con.query('SELECT idMovimiento,descripcion,cantidad,Unidades_idUnidades from movimiento where Requisiciones_idRequisiciones = ?',[idRequi]);
     con.end();
     return res.status(200).json(movs[0])
   } catch (error) {
