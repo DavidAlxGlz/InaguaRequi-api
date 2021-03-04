@@ -115,6 +115,7 @@ export const showRequisByDepartamentoUsuario =async(req:Request,res:Response):Pr
 export const showRequiById =async(req:Request,res:Response):Promise<Response>=>{
   if(!req.body){ res.status(400).json({msg: 'envia toda la informacion'})}
   const idRequi = req.body.idRequi;
+  console.log(req.body.idRequi)
   try {
     const conn = await connect();
     const requi = await conn.query('SELECT idRequisiciones,fecha,justificacion,usuarios.nombre,usuarios.apellido,centroCosto,departamento,direccion,directores.nombre as nombreDirector, directores.apellido as apellidoDirector,bienesOServicios FROM inagua_requis.requisiciones inner join usuarios on usuarios.idUsuarios = requisiciones.Usuarios_idUsuarios inner join centrocosto on centrocosto.idCentroCosto = requisiciones.CentroCosto_idCentroCosto inner join departamentos on departamentos.idDepartamentos = centroCosto.Departamentos_idDepartamentos inner join directores on directores.idDirectores = requisiciones.Directores_idDirectores inner join direcciones on direcciones.idDirecciones = centroCosto.Direcciones_idDirecciones where requisiciones.idRequisiciones = ?',[idRequi]);
@@ -125,6 +126,7 @@ export const showRequiById =async(req:Request,res:Response):Promise<Response>=>{
   }
 }
 
+//movimientos por id requisicion
 export const showMovimientosById = async(req:Request,res:Response):Promise<Response>=>{
   if(!req.body){ res.status(400).json({msg: 'envia toda la informacion'})}
   const idRequi = req.body.idRequi;

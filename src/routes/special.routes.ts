@@ -6,7 +6,7 @@ import {  signUp,getRolByToken } from "../controllers/user.controller";
 import { createRequi,infoUsuario,showRequis,showRequiById, showMovimientosById, showRequisByUser, showRequisByDepartamentoUsuario } from "../controllers/requis/requi.controller";
 import { authJwt } from "../middlewares";
 import { getDirectores } from "../controllers/data/extraData";
-import { createVale } from "../controllers/vales/vales.controller";
+import { createVale,infoProveedor, infoProveedorById } from "../controllers/vales/vales.controller";
 
 router.post('/signup', authJwt.verifyToken,authJwt.isModerator,signUp);
 router.post('/createRequi',authJwt.verifyToken,authJwt.isModerator,createRequi)
@@ -20,6 +20,8 @@ router.get('/showRequisByUser',showRequisByUser)
 router.get('/showRequisByDepartamentoUsuario',showRequisByDepartamentoUsuario)
 router.get('/getDirectores',getDirectores)
 router.post('/createVale',createVale)
+router.get('/infoProveedor',infoProveedor)
+router.post('/infoProveedorById',infoProveedorById)
 
 export default router;
 
