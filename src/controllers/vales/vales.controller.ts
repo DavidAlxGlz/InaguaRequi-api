@@ -61,9 +61,10 @@ export const infoProveedorById=async(req:Request,res:Response):Promise<Response>
   const idProveedor = req.body.idProveedor;
     try {
         const conn = await connect();
-        const proveedor = await conn.query('SELECT * from proveedores where idProveedor = ?',[idProveedor]);
-        console.log(proveedor[0])
+        const proveedor:any = await conn.query('SELECT * from proveedores where idProveedor = ?',[idProveedor]);
         conn.end()
+        console.log(proveedor[0])
+        if(proveedor[0].length === 0){return res.status(204).json({})}
         return res.status(200).json(proveedor[0])
     } catch (error) {
         return res.status(401).json(error)
