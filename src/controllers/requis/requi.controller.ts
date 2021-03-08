@@ -115,6 +115,7 @@ export const showRequisByDepartamentoUsuario =async(req:Request,res:Response):Pr
 export const showRequiById =async(req:Request,res:Response):Promise<Response>=>{
   if(!req.body){ res.status(400).json({msg: 'envia toda la informacion'})}
   const idRequi = req.body.idRequi;
+  console.log(req.body)
   console.log(req.body.idRequi)
   try {
     const conn = await connect();
@@ -129,7 +130,8 @@ export const showRequiById =async(req:Request,res:Response):Promise<Response>=>{
 //movimientos por id requisicion
 export const showMovimientosById = async(req:Request,res:Response):Promise<Response>=>{
   if(!req.body){ res.status(400).json({msg: 'envia toda la informacion'})}
-  const idRequi = req.body.idRequi;
+  const idRequi = req.body.Requisiciones_idRequisiciones;
+  console.log(req.body)
   try {
     const con = await connect();
     const movs:any = await con.query('SELECT idMovimiento,descripcion,cantidad,Unidades_idUnidades from movimiento where Requisiciones_idRequisiciones = ?',[idRequi]);

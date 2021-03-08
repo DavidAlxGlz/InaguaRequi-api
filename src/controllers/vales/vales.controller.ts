@@ -17,11 +17,6 @@ export const createVale =async(req:Request,res:Response):Promise<Response>=>{
     const arr = req.body;
     const conn = await pool.getConnection();
     await conn.beginTransaction();
-    console.log(arr.Proveedores_idProveedor)
-    console.log(arr.Requisiciones_idRequisiciones)
-    console.log(arr.fecha)
-    console.log(decoded.id)
-    console.log(arr.movimientos)
     const vale:any = await conn.query('INSERT INTO vales(idVales,Proveedores_idProveedor,Requisiciones_idRequisiciones,fecha,autoriza_idUsuarios) values(default,?,?,?,?)',[arr.Proveedores_idProveedor,arr.Requisiciones_idRequisiciones,arr.fecha,decoded.id]);
     //cambiar por select para obtener el id del vale creado
     console.log(vale)
@@ -38,7 +33,7 @@ export const createVale =async(req:Request,res:Response):Promise<Response>=>{
     } catch (error) {
         if (conn) await conn.rollback();
         pool.end();
-        return res.send(error)
+        return res.status(401).json(error)
         throw error;
     }
 }
@@ -58,7 +53,7 @@ export const infoProveedor=async(req:Request,res:Response):Promise<Response>=>{
 
 export const infoProveedorById=async(req:Request,res:Response):Promise<Response>=>{
     if(!req.body){ res.status(400).json({msg: 'envia toda la informacion'})}
-  const idProveedor = req.body.idProveedor;
+  const idProveedor = req.body.Proveedores_idProveedor;
     try {
         const conn = await connect();
         const proveedor:any = await conn.query('SELECT * from proveedores where idProveedor = ?',[idProveedor]);
@@ -69,4 +64,20 @@ export const infoProveedorById=async(req:Request,res:Response):Promise<Response>
     } catch (error) {
         return res.status(401).json(error)
     }
+}
+
+export const getVale = async(req:Request,res:Response):Promise<Response>=>{
+    if(!req.body){
+        res.status(400).json({ msg: 'envia toda la informacion' })
+    }
+    const idVale = req.body.idVale;
+    try {
+        const conn = await connect();
+        const vale:any = await conn.query('')
+    } catch (error) {
+        console.log(error)
+        return res.status(401).json(error)
+    }
+
+    return res
 }
