@@ -130,7 +130,8 @@ export const showRequiById =async(req:Request,res:Response):Promise<Response>=>{
 //movimientos por id requisicion
 export const showMovimientosById = async(req:Request,res:Response):Promise<Response>=>{
   if(!req.body){ res.status(400).json({msg: 'envia toda la informacion'})}
-  const idRequi = req.body.Requisiciones_idRequisiciones;
+  const idRequi = req.body.idRequi;
+  console.log("body")
   console.log(req.body)
   try {
     const con = await connect();
