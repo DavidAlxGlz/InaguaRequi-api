@@ -74,7 +74,7 @@ export const getMovimientosVale = async(req:Request,res:Response):Promise<Respon
     const idVale = req.body.idVale;
     try {
         const conn = await connect();
-        const vale:any = await conn.query('SELECT movimiento.descripcion,movimiento.cantidad,movimiento.Unidades_idUnidades from movimiento inner join vales on vales.idVales = movimiento.Vales_idVales where idVales = ?',[idVale])
+        const vale:any = await conn.query('SELECT movimiento.idMovimiento,movimiento.descripcion,movimiento.cantidad,movimiento.Unidades_idUnidades from movimiento inner join vales on vales.idVales = movimiento.Vales_idVales where idVales = ?',[idVale])
         return res.status(200).json(vale[0])
     } catch (error) {
         console.log(error)
@@ -86,8 +86,6 @@ export const getMovimientosVale = async(req:Request,res:Response):Promise<Respon
 export const showMovimientosValeById = async(req:Request,res:Response):Promise<Response>=>{
     if(!req.body){ res.status(400).json({ msg: 'Envia toda la informacion' })}
     const idRequi = req.body.Requisiciones_idRequisiciones;
-    console.log("body")
-    console.log(req.body)
     try {
       const con = await connect();
       const movs:any = await con.query('SELECT idMovimiento,descripcion,cantidad,Unidades_idUnidades from movimiento where Requisiciones_idRequisiciones = ?',[idRequi]);
