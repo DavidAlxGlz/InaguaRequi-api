@@ -5,7 +5,7 @@ import config from '.././config';
 import { connect } from "../database";
 
 
-var Rol:number;
+let Rol:number;
 
 export const verifyToken = async (req:Request, res:Response, next:NextFunction) =>{
 try {
@@ -18,14 +18,53 @@ if(!decoded) return res.status(404).json({ message:' token invalido ' })
     const us:any = await conn.query('select * from usuarios where idUsuarios = ?',[decoded.id])
     const user = us[0]
 if (user.length === 0) return res.status(404).json({ message: 'usuario no encontrado' })
-Rol = user[0].rolesIdRoles;
+Rol = user[0].Roles_idRoles;
 conn.end()
 next()
 } catch (error) {
     return res.status(401).json({ message: 'No autorizado' })
 }
 }
-export const isModerator = async (req:Request,res:Response,next:NextFunction)=>{
-   if(Rol <= 1) return res.status(404).json({ message:'rol invalido' })
-    next()
+
+
+export const isUsuario = async (req:Request,res:Response,next:NextFunction)=>{
+    if(Rol < 4) return res.status(404).json({ message:'rol invalido' })
+    else{
+        next()
+    }
+}
+
+export const isJefeDpto = async (req:Request,res:Response,next:NextFunction)=>{
+    if(Rol < 7) return res.status(404).json({ message:'rol invalido' })
+    else{
+        next()
+    }
+}
+
+export const isAdministrativo = async (req:Request,res:Response,next:NextFunction)=>{
+    if(Rol < 10) return res.status(404).json({ message:'rol invalido' })
+    else{
+        next()
+    }
+}
+
+export const isDirector = async (req:Request,res:Response,next:NextFunction)=>{
+    if(Rol < 13) return res.status(404).json({ message:'rol invalido' })
+    else{
+        next()
+    }
+    }
+    
+export const isAdmin = async (req:Request,res:Response,next:NextFunction)=>{
+    if(Rol < 16) return res.status(404).json({ message:'rol invalido' })
+    else{
+        next()
+    }
+}
+    
+export const isGod = async (req:Request,res:Response,next:NextFunction)=>{
+    if(Rol < 18) return res.status(404).json({ message:'rol invalido' })
+    else{
+        next()
+    }
 }

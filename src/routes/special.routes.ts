@@ -8,23 +8,23 @@ import { authJwt } from "../middlewares";
 import { getDirectores } from "../controllers/data/extraData";
 import { createVale,infoProveedor, infoProveedorById, showMovimientosValeById, getMovimientosVale, showValeById } from "../controllers/vales/vales.controller";
 
-router.post('/signup', authJwt.verifyToken,authJwt.isModerator,signUp);
-router.post('/createRequi',authJwt.verifyToken,authJwt.isModerator,createRequi)
-router.post('/showRequiById',showRequiById)
-router.post('/showMovimientosById',showMovimientosById)
-router.post('/getRolByToken',getRolByToken)
-router.get('/infoUsuario',infoUsuario)
+router.post('/signup', authJwt.verifyToken,signUp);
+router.post('/createRequi',authJwt.verifyToken,authJwt.isUsuario,createRequi)
+router.post('/showRequiById',authJwt.verifyToken,authJwt.isUsuario,showRequiById)
+router.post('/showMovimientosById',authJwt.verifyToken,authJwt.isUsuario,showMovimientosById)
+router.post('/getRolByToken',authJwt.verifyToken,getRolByToken)
+router.get('/infoUsuario',authJwt.verifyToken,infoUsuario)
 //router.get('/infoUnidades',infoUnidades)
-router.get('/showRequis',showRequis)
-router.get('/showRequisByUser',showRequisByUser)
-router.get('/showRequisByDepartamentoUsuario',showRequisByDepartamentoUsuario)
-router.get('/getDirectores',getDirectores)
-router.post('/createVale',createVale)
-router.get('/infoProveedor',infoProveedor)
-router.post('/infoProveedorById',infoProveedorById)
-router.post('/showMovimientosValeById',showMovimientosValeById)
-router.post('/getMovimientosVale',getMovimientosVale)
-router.post('/showValebyId',showValeById)
+router.get('/showRequis',authJwt.verifyToken,authJwt.isAdministrativo,showRequis)
+router.get('/showRequisByUser',authJwt.verifyToken,authJwt.isUsuario,showRequisByUser)
+router.get('/showRequisByDepartamentoUsuario',authJwt.verifyToken,authJwt.isJefeDpto,showRequisByDepartamentoUsuario)
+router.get('/getDirectores',authJwt.verifyToken,authJwt.isUsuario,getDirectores)
+router.post('/createVale',authJwt.verifyToken,authJwt.isAdministrativo,createVale)
+router.get('/infoProveedor',authJwt.verifyToken,authJwt.isAdministrativo,infoProveedor)
+router.post('/infoProveedorById',authJwt.verifyToken,authJwt.isAdministrativo,infoProveedorById)
+router.post('/showMovimientosValeById',authJwt.verifyToken,authJwt.isAdministrativo,showMovimientosValeById)
+router.post('/getMovimientosVale',authJwt.verifyToken,authJwt.isAdministrativo,getMovimientosVale)
+router.post('/showValebyId',authJwt.verifyToken,authJwt.isAdministrativo,showValeById)
 
 export default router;
 
