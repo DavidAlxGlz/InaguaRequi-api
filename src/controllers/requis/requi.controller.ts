@@ -127,6 +127,24 @@ export const showRequiById =async(req:Request,res:Response):Promise<Response>=>{
   }
 }
 
+//Requisición por id usuario e id requisicion
+export const findUserRequiById =async(req:Request,res:Response):Promise<Response>=>{
+  try {
+    const toke = req.headers["x-access-token"]?.toString();
+    if(!toke) return res.status(403).json({ message: "sin token" })
+    const decoded:any = jwt.verify(toke,config.SECRET);
+    if(!decoded) return res.status(404).json({ message:' token invalido ' })
+    const idRequi = req.body.idRequi;
+    console.log(idRequi)
+    const conn = await connect();
+    const requis:any = await conn.query('SELECT idRequisiciones,fecha,justificacion,nombre,apellido,departamento,direccion,centroCosto,bienesOServicios FROM inagua_requis.requisiciones inner join usuarios on usuarios.idUsuarios = requisiciones.Usuarios_idUsuarios inner join centrocosto on centroCosto.idCentroCosto = requisiciones.CentroCosto_idCentroCosto inner join departamentos on departamentos.idDepartamentos = centroCosto.Departamentos_idDepartamentos inner join direcciones on direcciones.idDirecciones = centroCosto.Direcciones_idDirecciones where usuarios.idUsuarios = ? and requisiciones.idRequisiciones = ?',[decoded.id,idRequi]);
+    console.log(requis[0])
+    return res.status(200).json(requis[0]);
+  } catch (error) {
+    return res.status(401).json(error);
+  }
+}
+
 //movimientos por id requisicion
 export const showMovimientosById = async(req:Request,res:Response):Promise<Response>=>{
   if(!req.body){ res.status(400).json({msg: 'envia toda la informacion'})}

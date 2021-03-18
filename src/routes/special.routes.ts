@@ -3,7 +3,7 @@ import {Router} from 'express';
 const router = Router();
 
 import {  signUp,getRolByToken } from "../controllers/user.controller";
-import { createRequi,infoUsuario,showRequis,showRequiById, showMovimientosById, showRequisByUser, showRequisByDepartamentoUsuario } from "../controllers/requis/requi.controller";
+import { createRequi,infoUsuario,showRequis,showRequiById, showMovimientosById, showRequisByUser, showRequisByDepartamentoUsuario,findUserRequiById } from "../controllers/requis/requi.controller";
 import { authJwt } from "../middlewares";
 import { getDirectores } from "../controllers/data/extraData";
 import { createVale,infoProveedor, infoProveedorById, showMovimientosValeById, getMovimientosVale, showValeById } from "../controllers/vales/vales.controller";
@@ -25,6 +25,7 @@ router.post('/infoProveedorById',authJwt.verifyToken,authJwt.isAdministrativo,in
 router.post('/showMovimientosValeById',authJwt.verifyToken,authJwt.isAdministrativo,showMovimientosValeById)
 router.post('/getMovimientosVale',authJwt.verifyToken,authJwt.isAdministrativo,getMovimientosVale)
 router.post('/showValebyId',authJwt.verifyToken,authJwt.isAdministrativo,showValeById)
+router.post('/findUserRequiById',authJwt.verifyToken,authJwt.isUsuario,findUserRequiById)
 
 export default router;
 
