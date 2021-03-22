@@ -14,7 +14,6 @@ router.post('/showRequiById',authJwt.verifyToken,authJwt.isUsuario,showRequiById
 router.post('/showMovimientosById',authJwt.verifyToken,authJwt.isUsuario,showMovimientosById)
 router.post('/getRolByToken',authJwt.verifyToken,getRolByToken)
 router.get('/infoUsuario',authJwt.verifyToken,infoUsuario)
-//router.get('/infoUnidades',infoUnidades)
 router.get('/showRequis',authJwt.verifyToken,authJwt.isAdministrativo,showRequis)
 router.get('/showRequisByUser',authJwt.verifyToken,authJwt.isUsuario,showRequisByUser)
 router.get('/showRequisByDepartamentoUsuario',authJwt.verifyToken,authJwt.isJefeDpto,showRequisByDepartamentoUsuario)
