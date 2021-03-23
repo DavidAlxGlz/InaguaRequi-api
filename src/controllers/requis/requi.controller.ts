@@ -42,6 +42,7 @@ export const createRequi=async(req:Request,res:Response):Promise<Response>=>{
       } 
 }
 
+//informacion de usuario
 export const infoUsuario =async(req:Request,res:Response)=>{
   let conn:any = null;
   try {
@@ -52,16 +53,38 @@ export const infoUsuario =async(req:Request,res:Response)=>{
       const pool = await connect();
       conn = await pool.getConnection();
       const idUsuario = decoded.id;
-      const UserSelect:any = await conn.query('SELECT idUsuarios,nombre,apellido,Roles_idRoles,rol,centroCosto,departamentos.departamento,direcciones.direccion FROM usuarios INNER JOIN centrocosto ON usuarios.CentroCosto_idCentroCosto = centrocosto.idCentroCosto INNER JOIN roles ON usuarios.Roles_idroles = roles.idroles INNER JOIN direcciones ON direcciones.idDirecciones = centroCosto.Direcciones_idDirecciones INNER JOIN departamentos ON departamentos.idDepartamentos = centroCosto.Departamentos_idDepartamentos WHERE usuarios.idUsuarios = ?;',[idUsuario])
+      const UserSelect:any = await conn.query('SELECT idUsuarios,nombre,apellido,Roles_idRoles,rol,departamentos.idDepartamentos,departamentos.departamento,direcciones.idDirecciones,direcciones.direccion FROM usuarios INNER JOIN roles ON usuarios.Roles_idroles = roles.idroles INNER JOIN departamentos ON departamentos.idDepartamentos = usuarios.Departamentos_idDepartamentos INNER JOIN direcciones ON direcciones.idDirecciones = departamentos.Direcciones_idDirecciones WHERE usuarios.idUsuarios = ?;',[idUsuario])
       if(!UserSelect){
          return res.status(400).json({msg:'el usuario no existe'})
       }
-      const {idusuarios,nombre,apellido,centroCosto,rol,departamento,direccion} = UserSelect[0][0];
+      const {idUsuarios,nombre,apellido,rol,idDepartamentos,departamento,idDirecciones,direccion} = UserSelect[0][0];
       pool.end()
-      res.status(200).json({idusuarios,nombre,apellido,centroCosto,rol,departamento,direccion})
+      res.status(200).json({idUsuarios,nombre,apellido,rol,idDepartamentos,departamento,idDirecciones,direccion})
     } catch (error) {
       return res.status(401).json({ message: 'no autorizado' }) 
     }
+}
+
+//Obtener usuarios por departamento
+export const usuariosByDpto =async(req:Request,res:Response)=>{
+  if(!req.body || !req.header){
+    return res.status(400).json({ msg: 'Envia toda la informacion' })
+  }
+  let conn:any = null;
+  const Departamentos_idDepartamentos = req.body.idDepartamentos;
+  try {
+    const pool = await connect();
+    conn = await pool.getConnection();
+    const response:any = await conn.query('SELECT idUsuarios,nombre,apellido from usuarios where Departamentos_idDepartamentos = ?',[Departamentos_idDepartamentos])
+    if(!response){
+      return res.status(400).json({msg:'Sin resultados'})
+   }
+   pool.end()
+   res.status(200).json(response[0])
+  } catch (error) {
+    return res.status(401).json({ message: 'no autorizado' }) 
+
+  }
 }
 
 
@@ -115,8 +138,7 @@ export const showRequisByDepartamentoUsuario =async(req:Request,res:Response):Pr
 export const showRequiById =async(req:Request,res:Response):Promise<Response>=>{
   if(!req.body){ res.status(400).json({msg: 'envia toda la informacion'})}
   const idRequi = req.body.idRequi;
-  console.log(req.body)
-  console.log(req.body.idRequi)
+ 
   try {
     const conn = await connect();
     const requi = await conn.query('SELECT idRequisiciones,fecha,justificacion,usuarios.nombre,usuarios.apellido,centroCosto,departamento,direccion,directores.nombre as nombreDirector, directores.apellido as apellidoDirector,bienesOServicios FROM inagua_requis.requisiciones inner join usuarios on usuarios.idUsuarios = requisiciones.Usuarios_idUsuarios inner join centrocosto on centrocosto.idCentroCosto = requisiciones.CentroCosto_idCentroCosto inner join departamentos on departamentos.idDepartamentos = centroCosto.Departamentos_idDepartamentos inner join directores on directores.idDirectores = requisiciones.Directores_idDirectores inner join direcciones on direcciones.idDirecciones = centroCosto.Direcciones_idDirecciones where requisiciones.idRequisiciones = ?',[idRequi]);
