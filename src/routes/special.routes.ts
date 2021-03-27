@@ -3,7 +3,7 @@ import {Router} from 'express';
 const router = Router();
 
 import {  signUp,getRolByToken } from "../controllers/user.controller";
-import { createRequi,infoUsuario,showRequis,showRequiById, showMovimientosById, showRequisByUser, showRequisByDepartamentoUsuario,findUserRequiById,usuariosByDpto } from "../controllers/requis/requi.controller";
+import { createRequi,infoUsuario,showRequisPresupuesto,showRequiById, showMovimientosById, showRequisByUser, showRequisByDepartamentoUsuario,findUserRequiById,usuariosByDpto,getFecha } from "../controllers/requis/requi.controller";
 import { authJwt } from "../middlewares";
 import { getDirectores } from "../controllers/data/extraData";
 import { createVale,infoProveedor, infoProveedorById, showMovimientosValeById, getMovimientosVale, showValeById } from "../controllers/vales/vales.controller";
@@ -14,7 +14,6 @@ router.post('/showRequiById',authJwt.verifyToken,authJwt.isUsuario,showRequiById
 router.post('/showMovimientosById',authJwt.verifyToken,authJwt.isUsuario,showMovimientosById)
 router.post('/getRolByToken',authJwt.verifyToken,getRolByToken)
 router.get('/infoUsuario',authJwt.verifyToken,infoUsuario)
-router.get('/showRequis',authJwt.verifyToken,authJwt.isAdministrativo,showRequis)
 router.get('/showRequisByUser',authJwt.verifyToken,authJwt.isUsuario,showRequisByUser)
 router.get('/showRequisByDepartamentoUsuario',authJwt.verifyToken,authJwt.isJefeDpto,showRequisByDepartamentoUsuario)
 router.get('/getDirectores',authJwt.verifyToken,authJwt.isUsuario,getDirectores)
@@ -27,7 +26,9 @@ router.post('/showValebyId',authJwt.verifyToken,authJwt.isAdministrativo,showVal
 router.post('/findUserRequiById',authJwt.verifyToken,authJwt.isUsuario,findUserRequiById)
 
 //Nuevo modelo requis
+router.get('/showRequisPresupuesto',authJwt.verifyToken,showRequisPresupuesto)
 router.post('/getUsuariosByDpto',authJwt.verifyToken,authJwt.isUsuario,usuariosByDpto)
+router.get('/getFecha',authJwt.verifyToken,authJwt.isUsuario,getFecha)
 
 export default router;
 

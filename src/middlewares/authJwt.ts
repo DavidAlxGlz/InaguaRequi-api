@@ -28,7 +28,7 @@ next()
 
 
 export const isUsuario = async (req:Request,res:Response,next:NextFunction)=>{
-    if(Rol < 4) return res.status(404).json({ message:'rol invalido' })
+    if(Rol < 3) return res.status(404).json({ message:'rol invalido' })
     else{
         next()
     }
