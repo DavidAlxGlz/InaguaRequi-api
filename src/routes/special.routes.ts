@@ -3,7 +3,7 @@ import {Router} from 'express';
 const router = Router();
 
 import {  signUp,getRolByToken } from "../controllers/user.controller";
-import { createRequi,infoUsuario,showRequisPresupuesto,showRequiByIdPresupuesto,showRequiByIdPresupuestoAprobaciones,showRequiByIdDetailsPresupuesto, showMovimientosById, showRequisByUser, showRequisByDepartamentoUsuario,findUserRequiById,usuariosByDpto,getFecha,recibirhojaPresupuesto, showRequisPresupuestoAprobacion } from "../controllers/requis/requi.controller";
+import { createRequi,infoUsuario,showRequisPresupuesto,aprobarEnPresupuesto,showRequiByIdPresupuesto,showRequiByIdPresupuestoAprobaciones,showRequiByIdDetailsPresupuesto, showMovimientosById, showRequisByUser, showRequisByDepartamentoUsuario,findUserRequiById,usuariosByDpto,getFecha,recibirhojaPresupuesto, showRequisPresupuestoAprobacion } from "../controllers/requis/requi.controller";
 import { authJwt } from "../middlewares";
 import { getDirectores } from "../controllers/data/extraData";
 import { createVale,infoProveedor, infoProveedorById, showMovimientosValeById, getMovimientosVale, showValeById } from "../controllers/vales/vales.controller";
@@ -34,6 +34,7 @@ router.post('/recibirHojaPresupuesto',authJwt.verifyToken,recibirhojaPresupuesto
 router.post('/showRequiByIdPresupuesto',authJwt.verifyToken,authJwt.isUsuario,showRequiByIdPresupuesto)
 router.post('/showRequiByIdPresupuestoAprobaciones',authJwt.verifyToken,authJwt.isUsuario,showRequiByIdPresupuestoAprobaciones)
 router.post('/showRequiByIdDetailsPresupuesto',authJwt.verifyToken,authJwt.isUsuario,showRequiByIdDetailsPresupuesto)
+router.post('/aprobarEnPresupuesto',authJwt.verifyToken,aprobarEnPresupuesto)
 
 
 export default router;

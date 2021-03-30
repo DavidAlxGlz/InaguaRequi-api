@@ -146,6 +146,36 @@ const pool = await connect();
   }
 }
 
+//aprobar en presupuesto
+export const aprobarEnPresupuesto = async(req:Request,res:Response):Promise<Response>=>{
+  if(!req.body || !req.header){
+    return res.status(400).json({ msg: 'Envia toda la informacion' })
+}
+console.log(req.body)
+let con:any =null;
+const pool = await connect();
+  try {
+    const toke = req.headers["x-access-token"]?.toString();
+    if(!toke) return res.status(403).json({ message: "sin token" })
+    const decoded:any = jwt.verify(toke,config.SECRET);
+    if(!decoded) return res.status(404).json({ message:' token invalido ' })
+    const arr = req.body;
+    con = await pool.getConnection();
+    await con.beginTransaction();
+    const update = await con.query('UPDATE requisiciones SET estado = 3 where idRequisiciones = ?',[arr.idRequi]);
+    const addHistory = await con.query('INSERT INTO historial(idhistorial,Usuarios_idUsuarios,Requisiciones_idRequisiciones,comentarios,nuevoEstado) values(default,?,?,?,?)',[decoded.id,arr.idRequi,'Aprobada por presupuesto',3])
+    await con.commit();
+    pool.end()
+    return res.status(200).json({msg:'actualizado'})
+  } catch (error) {
+    if (con) await con.rollback();
+        pool.end();
+        return res.send(error)
+        throw error;
+  }
+}
+
+
 
 //ver todas las requisiciones de un usuario
 export const showRequisByUser =async(req:Request,res:Response):Promise<Response>=>{
