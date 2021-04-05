@@ -6,7 +6,7 @@ export async function connect(){
       
         host: 'localhost',
         user: 'root',
-        password: 'crypwpgs1',
+        password: '2602754',
         database: 'inagua_requis',
        
     });
