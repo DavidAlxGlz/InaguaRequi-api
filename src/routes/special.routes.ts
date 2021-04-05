@@ -3,7 +3,7 @@ import {Router} from 'express';
 const router = Router();
 
 import {  signUp,getRolByToken } from "../controllers/user.controller";
-import { createRequi,infoUsuario,showRequisPresupuesto,aprobarEnPresupuesto,showRequiByIdPresupuesto,showRequiByIdPresupuestoAprobaciones,showRequiByIdDetailsPresupuesto, showMovimientosById, showRequisByUser, showRequisByDepartamentoUsuario,findUserRequiById,usuariosByDpto,getFecha,recibirhojaPresupuesto, showRequisPresupuestoAprobacion, showRequisAdquisiciones, recibirhojaAdquisiciones, showRequisAdquisicionesAprobacion, aprobarEnAdquisiciones, showRequiByIdAdquisiciones, showRequiByIdAdquisicionesAprobaciones } from "../controllers/requis/requi.controller";
+import { createRequi,infoUsuario,rechazarEnAdquisiciones,rechazarEnPresupuesto,showRequisPresupuesto,aprobarEnPresupuesto,showRequiByIdPresupuesto,showRequiByIdPresupuestoAprobaciones,showRequiByIdDetailsPresupuesto,showRequisUsuarioRechazadas, showMovimientosById, showRequisByUser, showRequisByDepartamentoUsuario,findUserRequiById,usuariosByDpto,getFecha,recibirhojaPresupuesto, showRequisPresupuestoAprobacion, showRequisAdquisiciones, recibirhojaAdquisiciones, showRequisAdquisicionesAprobacion, aprobarEnAdquisiciones, showRequiByIdAdquisiciones, showRequiByIdAdquisicionesAprobaciones } from "../controllers/requis/requi.controller";
 import { authJwt } from "../middlewares";
 import { getDirectores } from "../controllers/data/extraData";
 import { createVale,infoProveedor, infoProveedorById, showMovimientosValeById, getMovimientosVale, showValeById } from "../controllers/vales/vales.controller";
@@ -35,6 +35,7 @@ router.post('/showRequiByIdPresupuesto',authJwt.verifyToken,authJwt.isUsuario,sh
 router.post('/showRequiByIdPresupuestoAprobaciones',authJwt.verifyToken,authJwt.isUsuario,showRequiByIdPresupuestoAprobaciones)
 router.post('/showRequiByIdDetailsPresupuesto',authJwt.verifyToken,authJwt.isUsuario,showRequiByIdDetailsPresupuesto)
 router.post('/aprobarEnPresupuesto',authJwt.verifyToken,aprobarEnPresupuesto)
+router.post('/rechazarEnPresupuesto',authJwt.verifyToken,rechazarEnPresupuesto)
 //usuario Adquisiciones
 router.get('/showRequisAdquisiciones',authJwt.verifyToken,showRequisAdquisiciones)
 router.post('/recibirHojaAdquisiciones',authJwt.verifyToken,recibirhojaAdquisiciones)
@@ -42,6 +43,9 @@ router.get('/showRequisAdquisicionesAprobacion',authJwt.verifyToken,showRequisAd
 router.post('/aprobarEnAdquisiciones',authJwt.verifyToken,aprobarEnAdquisiciones)
 router.post('/showRequiByIdAdquisiciones',authJwt.verifyToken,authJwt.isUsuario,showRequiByIdAdquisiciones)
 router.post('/showRequiByIdAdquisicionesAprobaciones',authJwt.verifyToken,authJwt.isUsuario,showRequiByIdAdquisicionesAprobaciones)
+router.post('/rechazarEnAdquisiciones',authJwt.verifyToken,rechazarEnAdquisiciones)
+//rechazadas
+router.get('/requisRechazadas',authJwt.verifyToken,showRequisUsuarioRechazadas)
 
 
 
