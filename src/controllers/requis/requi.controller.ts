@@ -46,6 +46,36 @@ export const createRequi=async(req:Request,res:Response):Promise<Response>=>{
       } 
 }
 
+//edit requi
+export const editRequi =async(req:Request,res:Response)=>{
+  if(!req.body || !req.header){
+    return res.status(400).json({ msg: 'Envia toda la informacion' })
+  }
+  let conn:any =null;
+  const pool = await connect();
+  try {
+    const toke = req.headers["x-access-token"]?.toString();
+    if(!toke) return res.status(403).json({ message: "sin token" })
+    const decoded:any = jwt.verify(toke,config.SECRET);
+    if(!decoded) return res.status(404).json({ message:' token invalido ' })
+    const arr = req.body;
+    const movimientos = arr.movimientos;
+    conn = await pool.getConnection();
+    await conn.beginTransaction();
+    const del = await conn.query('Delete from movimiento where Requisiciones_idRequisiciones = ?',[arr.idRequi]);
+    movimientos.map(async(requi:any,index:number)=>{
+      const movi = await conn.query('INSERT INTO movimiento (idMovimiento,descripcion,cantidad,Unidades_idUnidades,Requisiciones_idRequisiciones) values(default,?,?,?,?)',[requi.descripcion,requi.cantidad,requi.unidades,arr.idRequi]);
+    })
+    await conn.commit();
+    pool.end()
+    return res.status(200)
+  }catch (error){
+    if (conn) await conn.rollback();
+    pool.end();
+  }
+
+}
+
 //informacion de usuario
 export const infoUsuario =async(req:Request,res:Response)=>{
   let conn:any = null;
@@ -457,6 +487,21 @@ export const showMovimientosById = async(req:Request,res:Response):Promise<Respo
   try {
     const con = await connect();
     const movs:any = await con.query('SELECT idMovimiento,descripcion,cantidad,Unidades_idUnidades from movimiento where Requisiciones_idRequisiciones = ?',[idRequi]);
+    con.end();
+    if(movs[0].length === 0){return res.status(204).json('')}
+    return res.status(200).json(movs[0])
+  } catch (error) {
+    return res.status(401).json(error) 
+  }
+}
+
+//movimientos por id requisicion to edit
+export const showMovimientosByIdEdit = async(req:Request,res:Response):Promise<Response>=>{
+  if(!req.body){ res.status(400).json({msg: 'envia toda la informacion'})}
+  const idRequi = req.body.idRequi;
+  try {
+    const con = await connect();
+    const movs:any = await con.query('SELECT idMovimiento,descripcion,cantidad,Unidades_idUnidades as unidades from movimiento where Requisiciones_idRequisiciones = ?',[idRequi]);
     con.end();
     if(movs[0].length === 0){return res.status(204).json('')}
     return res.status(200).json(movs[0])
