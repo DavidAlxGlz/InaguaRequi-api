@@ -66,15 +66,42 @@ export const editRequi =async(req:Request,res:Response)=>{
     movimientos.map(async(requi:any,index:number)=>{
       const movi = await conn.query('INSERT INTO movimiento (idMovimiento,descripcion,cantidad,Unidades_idUnidades,Requisiciones_idRequisiciones) values(default,?,?,?,?)',[requi.descripcion,requi.cantidad,requi.unidades,arr.idRequi]);
     })
+    const estado = await conn.query('UPDATE requisiciones SET estado = 1 where idRequisiciones = ?',[arr.idRequi]);
+    const addHistory = await conn.query('INSERT INTO historial(idhistorial,Usuarios_idUsuarios,Requisiciones_idRequisiciones,comentarios,nuevoEstado) values(default,?,?,?,?)',[decoded.id,arr.idRequi,'Requisición editada',1]);
     await conn.commit();
     pool.end()
-    return res.status(200)
+    return res.status(200).json({msg:'editada con exito'})
   }catch (error){
     if (conn) await conn.rollback();
     pool.end();
   }
 
 }
+
+//informacion de usuario
+export const showHistorialById =async(req:Request,res:Response)=>{
+  if(!req.body || !req.header){
+    return res.status(400).json({ msg: 'Envia toda la informacion' })
+  }
+  const arr = req.body;
+  let conn:any = null;
+  try {
+      const toke = req.headers["x-access-token"]?.toString();  
+      if(!toke) return res.status(403).json({ message: "sin token" })
+      const decoded:any = jwt.verify(toke,config.SECRET);
+      if(!decoded) return res.status(404).json({ message:' token invalido '})
+      const pool = await connect();
+      conn = await pool.getConnection();
+      console.log(req.body)
+      const hist = await conn.query('select idhistorial,Usuarios_idUsuarios,comentarios,nuevoEstado,fecha,idUsuarios,nombre,apellido from historial join usuarios as usuario on usuario.idUsuarios = historial.Usuarios_idUsuarios where Requisiciones_idRequisiciones = ? order by fecha desc',[arr.idRequi]);
+      pool.end()
+      return res.status(200).json(hist[0])
+    } catch (error) {
+      return res.status(401).json({ message: 'no autorizado' }) 
+    }
+}
+
+
 
 //informacion de usuario
 export const infoUsuario =async(req:Request,res:Response)=>{
@@ -517,5 +544,18 @@ export const getFecha =async(req:Request,res:Response):Promise<Response>=>{
     return res.status(200).json({fecha:fecha})
   } catch (error) {
     return res.status(401).json(error)
+  }
+}
+
+//Requisiciones para historial
+export const showAllRequis = async(req:Request,res:Response):Promise<Response>=>{
+  try {
+    const con = await connect();
+    const requis = await con.query('Select * from requisiciones order by idRequisiciones desc');
+    con.end();
+    return res.status(200).json(requis[0])
+  } catch (error) {
+    return res.status(401).json(error) 
+    
   }
 }

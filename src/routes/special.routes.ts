@@ -3,7 +3,7 @@ import {Router} from 'express';
 const router = Router();
 
 import {  signUp,getRolByToken } from "../controllers/user.controller";
-import { createRequi,infoUsuario,rechazarEnAdquisiciones,rechazarEnPresupuesto,showRequisPresupuesto,aprobarEnPresupuesto,showRequiByIdPresupuesto,showRequiByIdPresupuestoAprobaciones,showRequiByIdDetailsPresupuesto,showRequisUsuarioRechazadas, showMovimientosById, showRequisByUser, showRequisByDepartamentoUsuario,findUserRequiById,usuariosByDpto,getFecha,recibirhojaPresupuesto, showRequisPresupuestoAprobacion, showRequisAdquisiciones, recibirhojaAdquisiciones, showRequisAdquisicionesAprobacion, aprobarEnAdquisiciones, showRequiByIdAdquisiciones, showRequiByIdAdquisicionesAprobaciones, showMovimientosByIdEdit, editRequi } from "../controllers/requis/requi.controller";
+import { createRequi,infoUsuario,rechazarEnAdquisiciones,rechazarEnPresupuesto,showRequisPresupuesto,aprobarEnPresupuesto,showRequiByIdPresupuesto,showRequiByIdPresupuestoAprobaciones,showRequiByIdDetailsPresupuesto,showRequisUsuarioRechazadas, showMovimientosById, showRequisByUser, showRequisByDepartamentoUsuario,findUserRequiById,usuariosByDpto,getFecha,recibirhojaPresupuesto, showRequisPresupuestoAprobacion, showRequisAdquisiciones, recibirhojaAdquisiciones, showRequisAdquisicionesAprobacion, aprobarEnAdquisiciones, showRequiByIdAdquisiciones, showRequiByIdAdquisicionesAprobaciones, showMovimientosByIdEdit, editRequi, showHistorialById, showAllRequis } from "../controllers/requis/requi.controller";
 import { authJwt } from "../middlewares";
 import { getDirectores } from "../controllers/data/extraData";
 import { createVale,infoProveedor, infoProveedorById, showMovimientosValeById, getMovimientosVale, showValeById } from "../controllers/vales/vales.controller";
@@ -48,6 +48,9 @@ router.post('/rechazarEnAdquisiciones',authJwt.verifyToken,rechazarEnAdquisicion
 router.get('/requisRechazadas',authJwt.verifyToken,showRequisUsuarioRechazadas)
 router.post('/showMovimientosByIdEdit',authJwt.verifyToken,showMovimientosByIdEdit)
 router.post('/editRequi',authJwt.verifyToken,editRequi)
+//Directores
+router.post('/showHistorialById',authJwt.verifyToken,showHistorialById)
+router.get('/showAllRequis',authJwt.verifyToken,showAllRequis)
 
 
 
