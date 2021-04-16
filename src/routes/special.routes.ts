@@ -59,5 +59,6 @@ router.get('/getProveedoresEstudio',authJwt.verifyToken,getProveedoresEstudio)
 
 
 
+
 export default router;
 
