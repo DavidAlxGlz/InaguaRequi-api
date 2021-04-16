@@ -7,6 +7,7 @@ import { createRequi,infoUsuario,rechazarEnAdquisiciones,rechazarEnPresupuesto,s
 import { authJwt } from "../middlewares";
 import { getDirectores } from "../controllers/data/extraData";
 import { createVale,infoProveedor, infoProveedorById, showMovimientosValeById, getMovimientosVale, showValeById } from "../controllers/vales/vales.controller";
+import { getMovimientosEstudio,getProveedoresEstudio } from '../controllers/estudio/estudio.controller';
 
 router.post('/signup', authJwt.verifyToken,signUp);
 router.post('/createRequi',authJwt.verifyToken,authJwt.isUsuario,createRequi)
@@ -51,6 +52,10 @@ router.post('/editRequi',authJwt.verifyToken,editRequi)
 //Directores
 router.post('/showHistorialById',authJwt.verifyToken,showHistorialById)
 router.get('/showAllRequis',authJwt.verifyToken,showAllRequis)
+//Estudio de mercado
+router.post('/getMovimientosEstudio',authJwt.verifyToken,getMovimientosEstudio)
+router.get('/getProveedoresEstudio',authJwt.verifyToken,getProveedoresEstudio)
+
 
 
 
