@@ -35,13 +35,20 @@ export const isUsuario = async (req:Request,res:Response,next:NextFunction)=>{
 }
 
 export const isJefeDpto = async (req:Request,res:Response,next:NextFunction)=>{
+    if(Rol < 5) return res.status(404).json({ message:'rol invalido' })
+    else{
+        next()
+    }
+}
+
+export const isPresupuesto = async (req:Request,res:Response,next:NextFunction)=>{
     if(Rol < 7) return res.status(404).json({ message:'rol invalido' })
     else{
         next()
     }
 }
 
-export const isAdministrativo = async (req:Request,res:Response,next:NextFunction)=>{
+export const isAdquisiciones = async (req:Request,res:Response,next:NextFunction)=>{
     if(Rol < 10) return res.status(404).json({ message:'rol invalido' })
     else{
         next()
@@ -56,7 +63,7 @@ export const isDirector = async (req:Request,res:Response,next:NextFunction)=>{
     }
     
 export const isAdmin = async (req:Request,res:Response,next:NextFunction)=>{
-    if(Rol < 16) return res.status(404).json({ message:'rol invalido' })
+    if(Rol < 17) return res.status(404).json({ message:'rol invalido' })
     else{
         next()
     }

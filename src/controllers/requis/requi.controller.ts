@@ -24,7 +24,7 @@ export const createRequi=async(req:Request,res:Response):Promise<Response>=>{
         const CC:any = await conn.query('SELECT idCentroCosto from centrocosto where centroCosto = ?',[arr.CentroCosto_idCentroCosto]);
         const idCC = CC[0][0].idCentroCosto;
         await conn.beginTransaction();
-        const requi:any = await conn.query(`INSERT INTO requisiciones(idRequisiciones,fecha,justificacion,Usuarios_idUsuarios,CentroCosto_idCentroCosto,Directores_idDirectores,bienesOServicios,Usuarios_requiriente,estado) values(default,?,?,?,?,?,?,?,?)`,[arr.fecha,arr.justificacion,decoded.id,idCC,arr.Directores_idDirectores,arr.bienesOServicios,arr.Usuarios_requiriente,arr.estado]);
+        const requi:any = await conn.query(`INSERT INTO requisiciones(idRequisiciones,fecha,justificacion,Usuarios_idUsuarios,CentroCosto_idCentroCosto,Directores_idDirectores,bienesOServicios,Usuarios_requiriente,estado,gastoCorriente,recursoPropio,recursoOtros,descOtros) values(default,?,?,?,?,?,?,?,?,?,?,?,?)`,[arr.fecha,arr.justificacion,decoded.id,idCC,arr.Directores_idDirectores,arr.bienesOServicios,arr.Usuarios_requiriente,arr.estado,arr.gastoCorriente,arr.recursoPropio,arr.recursoOtros,arr.descOtros]);
 
         //cambiar por select para obtener el id de la requi creada
         const idNuevaRequi = requi[0].insertId;
@@ -33,7 +33,7 @@ export const createRequi=async(req:Request,res:Response):Promise<Response>=>{
        })
 
        //Añadir al historial el movimiento realizado
-       const histo = await conn.query('INSERT INTO historial(idhistorial,Usuarios_idUsuarios,Requisiciones_idRequisiciones,comentarios,nuevoEstado) values(default,?,?,?,?)',[decoded.id,idNuevaRequi,'Nueva Requi',1]);
+       const histo = await conn.query('INSERT INTO historial(idhistorial,Usuarios_idUsuarios,Requisiciones_idRequisiciones,comentarios,nuevoEstado) values(default,?,?,?,?)',[decoded.id,idNuevaRequi,'Nueva Requisición',1]);
 
         await conn.commit();
         pool.end()
@@ -127,16 +127,20 @@ export const infoUsuario =async(req:Request,res:Response)=>{
 }
 
 //Obtener usuarios por departamento
-export const usuariosByDpto =async(req:Request,res:Response)=>{
+export const solicitantesByUser =async(req:Request,res:Response)=>{
   if(!req.body || !req.header){
     return res.status(400).json({ msg: 'Envia toda la informacion' })
   }
   let conn:any = null;
   const Departamentos_idDepartamentos = req.body.idDepartamentos;
   try {
+    const toke = req.headers["x-access-token"]?.toString();  
+      if(!toke) return res.status(403).json({ message: "sin token" })
+      const decoded:any = jwt.verify(toke,config.SECRET);
+      if(!decoded) return res.status(404).json({ message:' token invalido '})
     const pool = await connect();
     conn = await pool.getConnection();
-    const response:any = await conn.query('SELECT idUsuarios,nombre,apellido from usuarios where Departamentos_idDepartamentos = ?',[Departamentos_idDepartamentos])
+    const response:any = await conn.query('select * from solicitantes inner join usuarios as usuario on usuario.idUsuarios = solicitantes.Usuarios_idUsuarios where solicitantes.Usuario = ?',[decoded.id])
     if(!response){
       return res.status(400).json({msg:'Sin resultados'})
     }
@@ -177,6 +181,46 @@ export const showRequisUsuarioRechazadas =async(req:Request,res:Response):Promis
       return res.status(401).json({ message: 'no autorizado' }) 
     }
 }
+
+//ver todas las requisiciones aprobadas
+export const showRequisUsuarioAprobadas =async(req:Request,res:Response):Promise<Response>=>{
+  try {
+    const toke = req.headers["x-access-token"]?.toString();  
+      if(!toke) return res.status(403).json({ message: "sin token" })
+      const decoded:any = jwt.verify(toke,config.SECRET);
+      if(!decoded) return res.status(404).json({ message:' token invalido '})
+      const conn = await connect();
+      const requis = await conn.query('SELECT idRequisiciones,fecha,justificacion,requiriente.nombre as NomRequiriente, requiriente.apellido as ApeRequiriente, centrocosto.centroCosto,CCdepartamento.departamento as CCdepartamento,CCdireccion.direccion as CCdireccion,centroCosto,bienesOServicios,requi.estado,DptoUsuario.departamento FROM inagua_requis.requisiciones as requi inner join usuarios as requiriente on requiriente.idUsuarios = requi.Usuarios_requiriente inner join usuarios as usuario on usuario.idUsuarios = requi.Usuarios_idUsuarios inner join centrocosto on centrocosto.idCentroCosto = requi.CentroCosto_idCentroCosto inner join departamentos as CCdepartamento on CCdepartamento.idDepartamentos = centrocosto.Departamentos_idDepartamentos inner join direcciones as CCdireccion on CCdireccion.idDirecciones = CCdepartamento.Direcciones_idDirecciones inner join departamentos as DptoUsuario on DptoUsuario.idDepartamentos = usuario.Departamentos_idDepartamentos where requi.estado = 5 and usuario.idUsuarios = ? order by idRequisiciones desc;',[decoded.id]);
+      conn.end()
+     return res.status(200).json(requis[0])
+    } catch (error) {
+      return res.status(401).json({ message: 'no autorizado' }) 
+    }
+}
+
+//para ver el ultimo rechazo de una requisicion en detalles de rechazadas
+export const showLastRechazoByIdRequi =async(req:Request,res:Response)=>{
+  if(!req.body || !req.header){
+    return res.status(400).json({ msg: 'Envia toda la informacion' })
+  }
+  const arr = req.body;
+  let conn:any = null;
+  try {
+      const toke = req.headers["x-access-token"]?.toString();  
+      if(!toke) return res.status(403).json({ message: "sin token" })
+      const decoded:any = jwt.verify(toke,config.SECRET);
+      if(!decoded) return res.status(404).json({ message:' token invalido '})
+      const pool = await connect();
+      conn = await pool.getConnection();
+      console.log(req.body)
+      const hist = await conn.query('select * from historial where Requisiciones_idRequisiciones = ? and nuevoEstado = 0 order by fecha desc limit 1',[arr.idRequi]);
+      pool.end()
+      return res.status(200).json(hist[0])
+    } catch (error) {
+      return res.status(401).json({ message: 'no autorizado' }) 
+    }
+}
+
 
 //ver todas las requisiciones adquisiciones Solicitudes
 export const showRequisAdquisiciones =async(req:Request,res:Response):Promise<Response>=>{
@@ -413,7 +457,23 @@ export const findUserRequiById =async(req:Request,res:Response):Promise<Response
     if(!decoded) return res.status(404).json({ message:' token invalido ' })
     const idRequi = req.body.idRequi;
     const conn = await connect();
-    const requis:any = await conn.query('SELECT idRequisiciones,fecha,justificacion,requiriente.nombre as NomRequiriente, requiriente.apellido as ApeRequiriente, centrocosto.centroCosto,CCdepartamento.departamento as CCdepartamento, CCdireccion.direccion as CCdireccion,centroCosto,bienesOServicios FROM inagua_requis.requisiciones as requi inner join usuarios as requiriente on requiriente.idUsuarios = requi.Usuarios_requiriente inner join usuarios as usuario on usuario.idUsuarios = requi.Usuarios_idUsuarios inner join centrocosto on centrocosto.idCentroCosto = requi.CentroCosto_idCentroCosto inner join departamentos as CCdepartamento on CCdepartamento.idDepartamentos = centrocosto.Departamentos_idDepartamentos inner join direcciones as CCdireccion on CCdireccion.idDirecciones = CCdepartamento.Direcciones_idDirecciones where usuario.idUsuarios = ? and requi.idRequisiciones = ? order by idRequisiciones desc;',[decoded.id,idRequi]);
+    const requis:any = await conn.query('SELECT idRequisiciones,fecha,justificacion,requiriente.nombre as NomRequiriente, requiriente.apellido as ApeRequiriente, centrocosto.centroCosto,CCdepartamento.departamento as CCdepartamento, CCdireccion.direccion as CCdireccion,centroCosto,bienesOServicios,requi.estado FROM inagua_requis.requisiciones as requi inner join usuarios as requiriente on requiriente.idUsuarios = requi.Usuarios_requiriente inner join usuarios as usuario on usuario.idUsuarios = requi.Usuarios_idUsuarios inner join centrocosto on centrocosto.idCentroCosto = requi.CentroCosto_idCentroCosto inner join departamentos as CCdepartamento on CCdepartamento.idDepartamentos = centrocosto.Departamentos_idDepartamentos inner join direcciones as CCdireccion on CCdireccion.idDirecciones = CCdepartamento.Direcciones_idDirecciones where usuario.idUsuarios = ? and requi.idRequisiciones = ? order by idRequisiciones desc;',[decoded.id,idRequi]);
+    return res.status(200).json(requis[0]);
+  } catch (error) {
+    return res.status(401).json(error);
+  }
+}
+
+//Requisición por id usuario e id requisicion (buscador) Aprobadas
+export const findUserRequiByIdAprobadas =async(req:Request,res:Response):Promise<Response>=>{
+  try {
+    const toke = req.headers["x-access-token"]?.toString();
+    if(!toke) return res.status(403).json({ message: "sin token" })
+    const decoded:any = jwt.verify(toke,config.SECRET);
+    if(!decoded) return res.status(404).json({ message:' token invalido ' })
+    const idRequi = req.body.idRequi;
+    const conn = await connect();
+    const requis:any = await conn.query('SELECT idRequisiciones,fecha,justificacion,requiriente.nombre as NomRequiriente, requiriente.apellido as ApeRequiriente, centrocosto.centroCosto,CCdepartamento.departamento as CCdepartamento, CCdireccion.direccion as CCdireccion,centroCosto,bienesOServicios,requi.estado FROM inagua_requis.requisiciones as requi inner join usuarios as requiriente on requiriente.idUsuarios = requi.Usuarios_requiriente inner join usuarios as usuario on usuario.idUsuarios = requi.Usuarios_idUsuarios inner join centrocosto on centrocosto.idCentroCosto = requi.CentroCosto_idCentroCosto inner join departamentos as CCdepartamento on CCdepartamento.idDepartamentos = centrocosto.Departamentos_idDepartamentos inner join direcciones as CCdireccion on CCdireccion.idDirecciones = CCdepartamento.Direcciones_idDirecciones where usuario.idUsuarios = ? and requi.idRequisiciones = ? and requi.estado = 5 order by idRequisiciones desc;',[decoded.id,idRequi]);
     return res.status(200).json(requis[0]);
   } catch (error) {
     return res.status(401).json(error);
@@ -478,13 +538,27 @@ export const showRequiByIdPresupuesto =async(req:Request,res:Response):Promise<R
   }
 }
 
+//ver una sola requisicion por id ( historial )
+export const showRequiByIdHistorial =async(req:Request,res:Response):Promise<Response>=>{
+  if(!req.body){ res.status(400).json({msg: 'envia toda la informacion'})}
+  const idRequi = req.body.idRequi;
+  try {
+    const conn = await connect();
+    const requi = await conn.query('Select requi.idRequisiciones,requi.fecha,requi.justificacion,requiriente.nombre as NomRequiriente,bienesOServicios, requiriente.apellido as ApeRequiriente, centrocosto.centroCosto,CCdepartamento.departamento as CCdepartamento, CCdireccion.direccion as CCdireccion,director.nombre as NomDirector, director.apellido as ApeDirector from requisiciones as requi inner join usuarios as requiriente on requiriente.idUsuarios = requi.Usuarios_requiriente inner join usuarios as usuario on usuario.idUsuarios = requi.Usuarios_idUsuarios inner join centrocosto on centrocosto.idCentroCosto = requi.CentroCosto_idCentroCosto inner join departamentos as CCdepartamento on CCdepartamento.idDepartamentos = centrocosto.Departamentos_idDepartamentos inner join direcciones as CCdireccion on CCdireccion.idDirecciones = CCdepartamento.Direcciones_idDirecciones inner join directores as director on director.idDirectores = requi.Directores_idDirectores where requi.idRequisiciones = ?',[idRequi]);
+    conn.end()
+   return res.status(200).json(requi[0])
+  } catch (error) {
+    return res.status(401).json(error) 
+  }
+}
+
 //ver una sola requisicion por id ( Adquisiciones )
 export const showRequiByIdAdquisiciones =async(req:Request,res:Response):Promise<Response>=>{
   if(!req.body){ res.status(400).json({msg: 'envia toda la informacion'})}
   const idRequi = req.body.idRequi;
   try {
     const conn = await connect();
-    const requi = await conn.query('Select requi.idRequisiciones,requi.fecha,requi.justificacion,requiriente.nombre as NomRequiriente,bienesOServicios, requiriente.apellido as ApeRequiriente, centrocosto.centroCosto,CCdepartamento.departamento as CCdepartamento, CCdireccion.direccion as CCdireccion,director.nombre as NomDirector, director.apellido as ApeDirector from requisiciones as requi inner join usuarios as requiriente on requiriente.idUsuarios = requi.Usuarios_requiriente inner join usuarios as usuario on usuario.idUsuarios = requi.Usuarios_idUsuarios inner join centrocosto on centrocosto.idCentroCosto = requi.CentroCosto_idCentroCosto inner join departamentos as CCdepartamento on CCdepartamento.idDepartamentos = centrocosto.Departamentos_idDepartamentos inner join direcciones as CCdireccion on CCdireccion.idDirecciones = CCdepartamento.Direcciones_idDirecciones inner join directores as director on director.idDirectores = requi.Directores_idDirectores where requi.idRequisiciones = ? and estado = 3',[idRequi]);
+    const requi = await conn.query('Select requi.idRequisiciones,requi.fecha,requi.justificacion,requiriente.nombre as NomRequiriente,bienesOServicios, requiriente.apellido as ApeRequiriente, centrocosto.centroCosto,CCdepartamento.departamento as CCdepartamento, CCdireccion.direccion as CCdireccion,director.nombre as NomDirector, director.apellido as ApeDirector,requi.estado from requisiciones as requi inner join usuarios as requiriente on requiriente.idUsuarios = requi.Usuarios_requiriente inner join usuarios as usuario on usuario.idUsuarios = requi.Usuarios_idUsuarios inner join centrocosto on centrocosto.idCentroCosto = requi.CentroCosto_idCentroCosto inner join departamentos as CCdepartamento on CCdepartamento.idDepartamentos = centrocosto.Departamentos_idDepartamentos inner join direcciones as CCdireccion on CCdireccion.idDirecciones = CCdepartamento.Direcciones_idDirecciones inner join directores as director on director.idDirectores = requi.Directores_idDirectores where requi.idRequisiciones = ? and estado = 3',[idRequi]);
     conn.end()
    return res.status(200).json(requi[0])
   } catch (error) {
@@ -498,7 +572,21 @@ export const showRequiByIdDetailsPresupuesto =async(req:Request,res:Response):Pr
   const idRequi = req.body.idRequi;
   try {
     const conn = await connect();
-    const requi = await conn.query('Select requi.idRequisiciones,requi.fecha,requi.justificacion,requiriente.nombre as NomRequiriente, requiriente.apellido as ApeRequiriente, centrocosto.centroCosto,CCdepartamento.departamento as CCdepartamento, CCdireccion.direccion as CCdireccion,director.nombre as NomDirector, director.apellido as ApeDirector from requisiciones as requi inner join usuarios as requiriente on requiriente.idUsuarios = requi.Usuarios_requiriente inner join usuarios as usuario on usuario.idUsuarios = requi.Usuarios_idUsuarios inner join centrocosto on centrocosto.idCentroCosto = requi.CentroCosto_idCentroCosto inner join departamentos as CCdepartamento on CCdepartamento.idDepartamentos = centrocosto.Departamentos_idDepartamentos inner join direcciones as CCdireccion on CCdireccion.idDirecciones = CCdepartamento.Direcciones_idDirecciones inner join directores as director on director.idDirectores = requi.Directores_idDirectores where requi.idRequisiciones = ?',[idRequi]);
+    const requi = await conn.query('Select requi.idRequisiciones,requi.fecha,requi.justificacion,requiriente.nombre as NomRequiriente, requiriente.apellido as ApeRequiriente, centrocosto.centroCosto,CCdepartamento.departamento as CCdepartamento, CCdireccion.direccion as CCdireccion,director.nombre as NomDirector, director.apellido as ApeDirector,requi.gastoCorriente, requi.recursoPropio, requi.recursoOtros,requi.descOtros from requisiciones as requi inner join usuarios as requiriente on requiriente.idUsuarios = requi.Usuarios_requiriente inner join usuarios as usuario on usuario.idUsuarios = requi.Usuarios_idUsuarios inner join centrocosto on centrocosto.idCentroCosto = requi.CentroCosto_idCentroCosto inner join departamentos as CCdepartamento on CCdepartamento.idDepartamentos = centrocosto.Departamentos_idDepartamentos inner join direcciones as CCdireccion on CCdireccion.idDirecciones = CCdepartamento.Direcciones_idDirecciones inner join directores as director on director.idDirectores = requi.Directores_idDirectores where requi.idRequisiciones = ?',[idRequi]);
+    conn.end()
+   return res.status(200).json(requi[0])
+  } catch (error) {
+    return res.status(401).json(error) 
+  }
+}
+
+export const showRequiByIdDetailsUsuario =async(req:Request,res:Response):Promise<Response>=>{
+  if(!req.body){ res.status(400).json({msg: 'envia toda la informacion'})}
+  const idRequi = req.body.idRequi;
+  console.log('si entra')
+  try {
+    const conn = await connect();
+    const requi = await conn.query('Select requi.idRequisiciones,requi.fecha,requi.justificacion,requiriente.nombre as NomRequiriente, requiriente.apellido as ApeRequiriente, centrocosto.centroCosto,CCdepartamento.departamento as CCdepartamento, CCdireccion.direccion as CCdireccion,director.nombre as NomDirector, director.apellido as ApeDirector,requi.gastoCorriente, requi.recursoPropio, requi.recursoOtros,requi.descOtros, requi.estado from requisiciones as requi inner join usuarios as requiriente on requiriente.idUsuarios = requi.Usuarios_requiriente inner join usuarios as usuario on usuario.idUsuarios = requi.Usuarios_idUsuarios inner join centrocosto on centrocosto.idCentroCosto = requi.CentroCosto_idCentroCosto inner join departamentos as CCdepartamento on CCdepartamento.idDepartamentos = centrocosto.Departamentos_idDepartamentos inner join direcciones as CCdireccion on CCdireccion.idDirecciones = CCdepartamento.Direcciones_idDirecciones inner join directores as director on director.idDirectores = requi.Directores_idDirectores where requi.idRequisiciones = ?',[idRequi]);
     conn.end()
    return res.status(200).json(requi[0])
   } catch (error) {
@@ -551,11 +639,39 @@ export const getFecha =async(req:Request,res:Response):Promise<Response>=>{
 export const showAllRequis = async(req:Request,res:Response):Promise<Response>=>{
   try {
     const con = await connect();
-    const requis = await con.query('Select * from requisiciones order by idRequisiciones desc');
+    const requis = await con.query('SELECT idRequisiciones,fecha,justificacion,requiriente.nombre as NomRequiriente, requiriente.apellido as ApeRequiriente, centrocosto.centroCosto,CCdepartamento.departamento as CCdepartamento, CCdireccion.direccion as CCdireccion,centroCosto,bienesOServicios, requi.estado FROM inagua_requis.requisiciones as requi inner join usuarios as requiriente on requiriente.idUsuarios = requi.Usuarios_requiriente inner join usuarios as usuario on usuario.idUsuarios = requi.Usuarios_idUsuarios inner join centrocosto on centrocosto.idCentroCosto = requi.CentroCosto_idCentroCosto inner join departamentos as CCdepartamento on CCdepartamento.idDepartamentos = centrocosto.Departamentos_idDepartamentos inner join direcciones as CCdireccion on CCdireccion.idDirecciones = CCdepartamento.Direcciones_idDirecciones order by idRequisiciones desc;');
     con.end();
     return res.status(200).json(requis[0])
   } catch (error) {
     return res.status(401).json(error) 
     
+  }
+}
+
+export const finalizarEntrega = async(req:Request,res:Response):Promise<Response>=>{
+  if(!req.body || !req.header){
+    return res.status(400).json({ msg: 'Envia toda la informacion' })
+}
+console.log(req.body.idRequi)
+let con:any =null;
+const pool = await connect();
+  try {
+    const toke = req.headers["x-access-token"]?.toString();
+    if(!toke) return res.status(403).json({ message: "sin token" })
+    const decoded:any = jwt.verify(toke,config.SECRET);
+    if(!decoded) return res.status(404).json({ message:' token invalido ' })
+    const arr = req.body;
+    con = await pool.getConnection();
+    await con.beginTransaction();
+    const update = await con.query('UPDATE requisiciones SET estado = 6 where idRequisiciones = ?',[arr.idRequi]);
+    const addHistory = await con.query('INSERT INTO historial(idhistorial,Usuarios_idUsuarios,Requisiciones_idRequisiciones,comentarios,nuevoEstado) values(default,?,?,?,?)',[decoded.id,arr.idRequi,'Requisición Finalizada Satisfactoriamente',6])
+    await con.commit();
+    pool.end()
+    return res.status(200).json({msg:'actualizado'})
+  } catch (error) {
+    if (con) await con.rollback();
+        pool.end();
+        return res.send(error)
+        throw error;
   }
 }

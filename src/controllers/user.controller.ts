@@ -25,7 +25,7 @@ export const signUp = async (req:Request,res:Response):Promise<Response> =>{
     const passEncrypt = await encryptPassword(req.body.password);
     const reqUser = req.body;
     reqUser.password = passEncrypt;
-    const insertUser =  await conn.query('INSERT INTO inagua_requis.usuarios (idUsuarios,usuario,password,nombre,apellido,Roles_idRoles,CentroCosto_idCentroCosto)VALUES(default,?,?,?,?,?,?)',[reqUser.usuario,reqUser.password,reqUser.nombre,reqUser.apellido,reqUser.Roles_idRoles,reqUser.CentroCosto_idCentroCosto])
+    const insertUser =  await conn.query('INSERT INTO inagua_requis.usuarios (idUsuarios,usuario,password,nombre,apellido,Roles_idRoles,email,telefono,Departamentos_idDepartamentos)VALUES(default,?,?,?,?,?,?,?,?)',[reqUser.usuario,reqUser.password,reqUser.nombre,reqUser.apellido,reqUser.Roles_idRoles,reqUser.email,reqUser.telefono,reqUser.Departamentos_idDepartamentos])
     conn.end()
     return res.send(insertUser)
 }
