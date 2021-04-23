@@ -18,8 +18,6 @@ router.get('/showRequisByDepartamentoUsuario',authJwt.verifyToken,authJwt.isJefe
 router.get('/getDirectores',authJwt.verifyToken,authJwt.isUsuario,getDirectores)
 
 
-
-
 //user
 router.post('/findUserRequiById',authJwt.verifyToken,authJwt.isUsuario,findUserRequiById)
 router.get('/showRequisByUser',authJwt.verifyToken,authJwt.isUsuario,showRequisByUser)
@@ -69,9 +67,13 @@ router.post('/editRequi',authJwt.verifyToken,authJwt.isUsuario,editRequi)
 router.post('/ultimoRechazo',authJwt.verifyToken,authJwt.isUsuario,showLastRechazoByIdRequi)
 
 //Directores
-router.post('/showHistorialById',authJwt.verifyToken,authJwt.isDirector,showHistorialById)
-router.get('/showAllRequis',authJwt.verifyToken,authJwt.isDirector,showAllRequis)
+router.post('/showDireccionRequis',authJwt.isDirector,)
+
+//Directores plus
+router.post('/showHistorialById',authJwt.verifyToken,authJwt.isDirectorPlus,showHistorialById)
+router.get('/showAllRequis',authJwt.verifyToken,authJwt.isDirectorPlus,showAllRequis)
 router.post('/showRequiByIdHistorial',authJwt.verifyToken,showRequiByIdHistorial)
+
 
 //Estudio de mercado
 router.post('/getMovimientosEstudio',authJwt.verifyToken,authJwt.isUsuario,getMovimientosEstudio)

@@ -60,7 +60,14 @@ export const isDirector = async (req:Request,res:Response,next:NextFunction)=>{
     else{
         next()
     }
+}
+
+export const isDirectorPlus = async (req:Request,res:Response,next:NextFunction)=>{
+    if(Rol < 15) return res.status(404).json({ message:'rol invalido' })
+    else{
+        next()
     }
+}
     
 export const isAdmin = async (req:Request,res:Response,next:NextFunction)=>{
     if(Rol < 17) return res.status(404).json({ message:'rol invalido' })
