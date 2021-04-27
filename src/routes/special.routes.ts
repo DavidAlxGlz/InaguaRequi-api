@@ -3,7 +3,7 @@ import {Router} from 'express';
 const router = Router();
 
 import {  signUp,getRolByToken } from "../controllers/user.controller";
-import { createRequi,finalizarEntrega,findUserRequiByIdAprobadas,showRequisUsuarioAprobadas,infoUsuario,showLastRechazoByIdRequi,rechazarEnAdquisiciones,rechazarEnPresupuesto,showRequisPresupuesto,showRequiByIdHistorial,showRequiByIdDetailsUsuario,aprobarEnPresupuesto,showRequiByIdPresupuesto,showRequiByIdPresupuestoAprobaciones,showRequiByIdDetailsPresupuesto,showRequisUsuarioRechazadas, showMovimientosById, showRequisByUser, showRequisByDepartamentoUsuario,findUserRequiById,solicitantesByUser,getFecha,recibirhojaPresupuesto, showRequisPresupuestoAprobacion, showRequisAdquisiciones, recibirhojaAdquisiciones, showRequisAdquisicionesAprobacion, aprobarEnAdquisiciones, showRequiByIdAdquisiciones, showRequiByIdAdquisicionesAprobaciones, showMovimientosByIdEdit, editRequi, showHistorialById, showAllRequis } from "../controllers/requis/requi.controller";
+import { createRequi,finalizarEntrega,findUserRequiByIdAprobadas,showRequisUsuarioAprobadas,infoUsuario,showLastRechazoByIdRequi,rechazarEnAdquisiciones,rechazarEnPresupuesto,showRequisPresupuesto,showRequiByIdHistorial,showRequiByIdDetailsUsuario,aprobarEnPresupuesto,showRequiByIdPresupuesto,showRequiByIdPresupuestoAprobaciones,showRequiByIdDetailsPresupuesto,showRequisUsuarioRechazadas, showMovimientosById, showRequisByUser, showRequisByDepartamentoUsuario,findUserRequiById,solicitantesByUser,getFecha,recibirhojaPresupuesto, showRequisPresupuestoAprobacion, showRequisAdquisiciones, recibirhojaAdquisiciones, showRequisAdquisicionesAprobacion, aprobarEnAdquisiciones, showRequiByIdAdquisiciones, showRequiByIdAdquisicionesAprobaciones, showMovimientosByIdEdit, editRequi, showHistorialById, showAllRequis, showRequisDirector, showRequiDirectorById } from "../controllers/requis/requi.controller";
 import { authJwt } from "../middlewares";
 import { getDirectores, getRoles, getDepartamentos, getUsuarios, addSolicitante } from "../controllers/data/extraData";
 import { createVale,infoProveedor, infoProveedorById, showMovimientosValeById, getMovimientosVale, showValeById } from "../controllers/vales/vales.controller";
@@ -67,7 +67,9 @@ router.post('/editRequi',authJwt.verifyToken,authJwt.isUsuario,editRequi)
 router.post('/ultimoRechazo',authJwt.verifyToken,authJwt.isUsuario,showLastRechazoByIdRequi)
 
 //Directores
-router.post('/showDireccionRequis',authJwt.isDirector,)
+router.get('/showDireccionRequis',authJwt.isDirector,showRequisDirector)
+router.post('/showDireccionRequiById',authJwt.isDirector,showRequiDirectorById)
+
 
 //Directores plus
 router.post('/showHistorialById',authJwt.verifyToken,authJwt.isDirectorPlus,showHistorialById)

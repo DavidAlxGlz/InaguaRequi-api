@@ -644,15 +644,41 @@ export const showAllRequis = async(req:Request,res:Response):Promise<Response>=>
     return res.status(200).json(requis[0])
   } catch (error) {
     return res.status(401).json(error) 
-    
   }
 }
 
 //Requisiciones para historial Director
 export const showRequisDirector = async(req:Request,res:Response):Promise<Response>=>{
   try {
+    const toke = req.headers["x-access-token"]?.toString();
+    if(!toke) return res.status(403).json({ message: "sin token" })
+    const decoded:any = jwt.verify(toke,config.SECRET);
+    if(!decoded) return res.status(404).json({ message:' token invalido ' })
     const con = await connect();
-    const requis = await con.query('SELECT idRequisiciones,fecha,justificacion,requiriente.nombre as NomRequiriente, requiriente.apellido as ApeRequiriente, centrocosto.centroCosto,CCdepartamento.departamento as CCdepartamento, CCdireccion.direccion as CCdireccion,centroCosto,bienesOServicios, requi.estado FROM inagua_requis.requisiciones as requi inner join usuarios as requiriente on requiriente.idUsuarios = requi.Usuarios_requiriente inner join usuarios as usuario on usuario.idUsuarios = requi.Usuarios_idUsuarios inner join centrocosto on centrocosto.idCentroCosto = requi.CentroCosto_idCentroCosto inner join departamentos as CCdepartamento on CCdepartamento.idDepartamentos = centrocosto.Departamentos_idDepartamentos inner join direcciones as CCdireccion on CCdireccion.idDirecciones = CCdepartamento.Direcciones_idDirecciones order by idRequisiciones desc;');
+    const direccion:any = await con.query('select idDirecciones from usuarios inner join departamentos as dpto on dpto.idDepartamentos = usuarios.Departamentos_idDepartamentos inner join direcciones as direc on direc.idDirecciones = dpto.Direcciones_idDirecciones where usuarios.idUsuarios = ?',[decoded.id]);
+    const idDireccion =direccion[0][0]['idDirecciones'];
+    const requis = await con.query('SELECT idRequisiciones,fecha,justificacion,requiriente.nombre as NomRequiriente, requiriente.apellido as ApeRequiriente, centrocosto.centroCosto,CCdepartamento.departamento as CCdepartamento, CCdireccion.direccion as CCdireccion,centroCosto,bienesOServicios, requi.estado ,usuario.Departamentos_idDepartamentos,direc.idDirecciones FROM inagua_requis.requisiciones as requi inner join usuarios as requiriente on requiriente.idUsuarios = requi.Usuarios_requiriente inner join usuarios as usuario on usuario.idUsuarios = requi.Usuarios_idUsuarios inner join centrocosto on centrocosto.idCentroCosto = requi.CentroCosto_idCentroCosto inner join departamentos as CCdepartamento on CCdepartamento.idDepartamentos = centrocosto.Departamentos_idDepartamentos inner join direcciones as CCdireccion on CCdireccion.idDirecciones = CCdepartamento.Direcciones_idDirecciones inner join departamentos as dpto on dpto.idDepartamentos = usuario.Departamentos_idDepartamentos inner join direcciones as direc on direc.idDirecciones = dpto.Direcciones_idDirecciones where direc.idDirecciones = ? order by idRequisiciones desc',[idDireccion]);
+    con.end();
+    return res.status(200).json(requis[0])
+  } catch (error) {
+    return res.status(401).json(error) 
+    
+  }
+}
+
+//Requisiciones para busqueda historial Director
+export const showRequiDirectorById = async(req:Request,res:Response):Promise<Response>=>{
+  if(!req.body){ res.status(400).json({msg: 'envia toda la informacion'})}
+  try {
+    const idRequi = req.body.idRequi;
+    const toke = req.headers["x-access-token"]?.toString();
+    if(!toke) return res.status(403).json({ message: "sin token" })
+    const decoded:any = jwt.verify(toke,config.SECRET);
+    if(!decoded) return res.status(404).json({ message:' token invalido ' })
+    const con = await connect();
+    const direccion:any = await con.query('select idDirecciones from usuarios inner join departamentos as dpto on dpto.idDepartamentos = usuarios.Departamentos_idDepartamentos inner join direcciones as direc on direc.idDirecciones = dpto.Direcciones_idDirecciones where usuarios.idUsuarios = ?',[decoded.id]);
+    const idDireccion =direccion[0][0]['idDirecciones'];
+    const requis = await con.query('SELECT idRequisiciones,fecha,justificacion,requiriente.nombre as NomRequiriente, requiriente.apellido as ApeRequiriente, centrocosto.centroCosto,CCdepartamento.departamento as CCdepartamento, CCdireccion.direccion as CCdireccion,centroCosto,bienesOServicios, requi.estado ,usuario.Departamentos_idDepartamentos,direc.idDirecciones FROM inagua_requis.requisiciones as requi inner join usuarios as requiriente on requiriente.idUsuarios = requi.Usuarios_requiriente inner join usuarios as usuario on usuario.idUsuarios = requi.Usuarios_idUsuarios inner join centrocosto on centrocosto.idCentroCosto = requi.CentroCosto_idCentroCosto inner join departamentos as CCdepartamento on CCdepartamento.idDepartamentos = centrocosto.Departamentos_idDepartamentos inner join direcciones as CCdireccion on CCdireccion.idDirecciones = CCdepartamento.Direcciones_idDirecciones inner join departamentos as dpto on dpto.idDepartamentos = usuario.Departamentos_idDepartamentos inner join direcciones as direc on direc.idDirecciones = dpto.Direcciones_idDirecciones where direc.idDirecciones = ? and requi.idRequisiciones = ? order by idRequisiciones desc',[idDireccion,idRequi]);
     con.end();
     return res.status(200).json(requis[0])
   } catch (error) {
