@@ -662,7 +662,6 @@ export const showRequisDirector = async(req:Request,res:Response):Promise<Respon
     return res.status(200).json(requis[0])
   } catch (error) {
     return res.status(401).json(error) 
-    
   }
 }
 
