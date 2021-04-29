@@ -41,7 +41,7 @@ export const createRequi=async(req:Request,res:Response):Promise<Response>=>{
       } catch (error) {
         if (conn) await conn.rollback();
         pool.end();
-        return res.send(error)
+        return res.status(400).send(error)
         throw error;
       } 
 }

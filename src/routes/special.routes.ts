@@ -8,6 +8,7 @@ import { authJwt } from "../middlewares";
 import { getDirectores, getRoles, getDepartamentos, getUsuarios, addSolicitante } from "../controllers/data/extraData";
 import { createVale,infoProveedor, infoProveedorById, showMovimientosValeById, getMovimientosVale, showValeById } from "../controllers/vales/vales.controller";
 import { getMovimientosEstudio,getProveedoresEstudio } from '../controllers/estudio/estudio.controller';
+import { programarLicitacion } from '../controllers/licitacion/licitacion';
 
 router.post('/signup',signUp);
 router.post('/createRequi',authJwt.verifyToken,authJwt.isUsuario,createRequi)
@@ -87,8 +88,8 @@ router.get('/getDepartamentos',authJwt.verifyToken,authJwt.isAdmin,getDepartamen
 router.get('/getUsuarios',authJwt.verifyToken,authJwt.isAdmin,getUsuarios)
 router.post('/addSolicitante',authJwt.verifyToken,authJwt.isAdmin,addSolicitante)
 
-
-
+//Licitaciones
+router.post('/programarLicitacion',authJwt.verifyToken,programarLicitacion)
 
 
 export default router;
