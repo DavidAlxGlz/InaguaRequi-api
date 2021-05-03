@@ -80,7 +80,7 @@ router.post('/showRequiByIdHistorial',authJwt.verifyToken,showRequiByIdHistorial
 
 //Estudio de mercado
 router.post('/getMovimientosEstudio',authJwt.verifyToken,authJwt.isUsuario,getMovimientosEstudio)
-router.get('/getProveedoresEstudio',authJwt.verifyToken,authJwt.isUsuario,getProveedoresEstudio)
+router.post('/getProveedoresEstudio',authJwt.verifyToken,authJwt.isUsuario,getProveedoresEstudio)
 
 //Administrador
 router.get('/getRoles',authJwt.verifyToken,authJwt.isAdmin,getRoles)
