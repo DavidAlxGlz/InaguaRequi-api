@@ -51,6 +51,7 @@ export const editRequi =async(req:Request,res:Response)=>{
   if(!req.body || !req.header){
     return res.status(400).json({ msg: 'Envia toda la informacion' })
   }
+  let msg='';
   let conn:any =null;
   const pool = await connect();
   try {
@@ -62,15 +63,22 @@ export const editRequi =async(req:Request,res:Response)=>{
     const movimientos = arr.movimientos;
     conn = await pool.getConnection();
     await conn.beginTransaction();
-    const del = await conn.query('Delete from movimiento where Requisiciones_idRequisiciones = ?',[arr.idRequi]);
-    movimientos.map(async(requi:any,index:number)=>{
+    const getEstado = await conn.query('SELECT estado FROM inagua_requis.requisiciones where idRequisiciones = ?',[arr.idRequi])
+    console.log(getEstado[0][0].estado)
+    if(getEstado[0][0].estado === 0 || getEstado[0][0].estado === 1){
+      const del = await conn.query('Delete from movimiento where Requisiciones_idRequisiciones = ?',[arr.idRequi]);
+      movimientos.map(async(requi:any,index:number)=>{
       const movi = await conn.query('INSERT INTO movimiento (idMovimiento,descripcion,cantidad,Unidades_idUnidades,Requisiciones_idRequisiciones) values(default,?,?,?,?)',[requi.descripcion,requi.cantidad,requi.unidades,arr.idRequi]);
-    })
-    const estado = await conn.query('UPDATE requisiciones SET estado = 1 where idRequisiciones = ?',[arr.idRequi]);
-    const addHistory = await conn.query('INSERT INTO historial(idhistorial,Usuarios_idUsuarios,Requisiciones_idRequisiciones,comentarios,nuevoEstado) values(default,?,?,?,?)',[decoded.id,arr.idRequi,'Requisición editada',1]);
-    await conn.commit();
+      })
+      const estado = await conn.query('UPDATE requisiciones SET estado = 1 where idRequisiciones = ?',[arr.idRequi]);
+      const addHistory = await conn.query('INSERT INTO historial(idhistorial,Usuarios_idUsuarios,Requisiciones_idRequisiciones,comentarios,nuevoEstado) values(default,?,?,?,?)',[decoded.id,arr.idRequi,'Requisición editada',1]);
+      await conn.commit();
+      msg ='Requisición editada con éxito';
+    }else{
+      msg='No es posible editar esta requisición'
+    }
     pool.end()
-    return res.status(200).json({msg:'editada con exito'})
+    return res.status(200).json({msg:msg})
   }catch (error){
     if (conn) await conn.rollback();
     pool.end();
