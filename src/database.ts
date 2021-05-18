@@ -9,7 +9,6 @@ export async function connect(){
         database: 'inagua_requis',
        
     });
-        
-    return connection;
     
+    return connection;   
 }
