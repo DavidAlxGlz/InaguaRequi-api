@@ -60,17 +60,17 @@ export const editRequi =async(req:Request,res:Response)=>{
     const decoded:any = jwt.verify(toke,config.SECRET);
     if(!decoded) return res.status(404).json({ message:' token invalido ' })
     const arr = req.body;
+    console.log(arr)
     const movimientos = arr.movimientos;
     conn = await pool.getConnection();
     await conn.beginTransaction();
     const getEstado = await conn.query('SELECT estado FROM inagua_requis.requisiciones where idRequisiciones = ?',[arr.idRequi])
-    console.log(getEstado[0][0].estado)
     if(getEstado[0][0].estado === 0 || getEstado[0][0].estado === 1){
       const del = await conn.query('Delete from movimiento where Requisiciones_idRequisiciones = ?',[arr.idRequi]);
       movimientos.map(async(requi:any,index:number)=>{
       const movi = await conn.query('INSERT INTO movimiento (idMovimiento,descripcion,cantidad,Unidades_idUnidades,Requisiciones_idRequisiciones) values(default,?,?,?,?)',[requi.descripcion,requi.cantidad,requi.unidades,arr.idRequi]);
       })
-      const estado = await conn.query('UPDATE requisiciones SET estado = 1 where idRequisiciones = ?',[arr.idRequi]);
+      const estado = await conn.query('UPDATE requisiciones SET estado = 1 , justificacion = ? , bienesOServicios = ? , Usuarios_requiriente = ? , Directores_idDirectores = ? , gastoCorriente = ? , recursoPropio = ? , recursoOtros = ? , descOtros = ? where idRequisiciones = ?',[arr.justificacion,arr.bienesOServicios,arr.Usuarios_requiriente,arr.Directores_idDirectores,arr.gastoCorriente,arr.recursoPropio,arr.recursoOtros,arr.descOtros,arr.idRequi]);
       const addHistory = await conn.query('INSERT INTO historial(idhistorial,Usuarios_idUsuarios,Requisiciones_idRequisiciones,comentarios,nuevoEstado) values(default,?,?,?,?)',[decoded.id,arr.idRequi,'Requisición editada',1]);
       await conn.commit();
       msg ='Requisición editada con éxito';
