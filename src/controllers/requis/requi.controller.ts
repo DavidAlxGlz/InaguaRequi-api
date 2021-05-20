@@ -588,6 +588,20 @@ export const showRequiByIdDetailsPresupuesto =async(req:Request,res:Response):Pr
   }
 }
 
+//Obtener Detalles para editar
+export const getDetailsToEdit =async(req:Request,res:Response):Promise<Response>=>{
+  if(!req.body){ res.status(400).json({msg: 'envia toda la informacion'})}
+  const idRequi = req.body.idRequi;
+  try {
+    const conn = await connect();
+    const requi = await conn.query('Select requi.idRequisiciones,requi.Directores_idDirectores,requi.Usuarios_requiriente,requi.bienesOServicios,requi.fecha,requi.justificacion,requiriente.nombre as NomRequiriente, requiriente.apellido as ApeRequiriente, centrocosto.centroCosto,CCdepartamento.departamento as CCdepartamento, CCdireccion.direccion as CCdireccion,director.nombre as NomDirector, director.apellido as ApeDirector,requi.gastoCorriente, requi.recursoPropio, requi.recursoOtros,requi.descOtros from requisiciones as requi inner join usuarios as requiriente on requiriente.idUsuarios = requi.Usuarios_requiriente inner join usuarios as usuario on usuario.idUsuarios = requi.Usuarios_idUsuarios inner join centrocosto on centrocosto.idCentroCosto = requi.CentroCosto_idCentroCosto inner join departamentos as CCdepartamento on CCdepartamento.idDepartamentos = centrocosto.Departamentos_idDepartamentos inner join direcciones as CCdireccion on CCdireccion.idDirecciones = CCdepartamento.Direcciones_idDirecciones inner join directores as director on director.idDirectores = requi.Directores_idDirectores where requi.idRequisiciones = ?',[idRequi]);
+    conn.end()
+   return res.status(200).json(requi[0])
+  } catch (error) {
+    return res.status(401).json(error) 
+  }
+}
+
 export const showRequiByIdDetailsUsuario =async(req:Request,res:Response):Promise<Response>=>{
   if(!req.body){ res.status(400).json({msg: 'envia toda la informacion'})}
   const idRequi = req.body.idRequi;
