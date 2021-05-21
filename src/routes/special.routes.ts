@@ -6,7 +6,7 @@ import {  signUp,getRolByToken } from "../controllers/user.controller";
 import { createRequi,finalizarEntrega,findUserRequiByIdAprobadas,showRequisUsuarioAprobadas,infoUsuario,showLastRechazoByIdRequi,rechazarEnAdquisiciones,rechazarEnPresupuesto,showRequisPresupuesto,showRequiByIdHistorial,showRequiByIdDetailsUsuario,aprobarEnPresupuesto,showRequiByIdPresupuesto,showRequiByIdPresupuestoAprobaciones,showRequiByIdDetailsPresupuesto,showRequisUsuarioRechazadas, showMovimientosById, showRequisByUser, showRequisByDepartamentoUsuario,findUserRequiById,solicitantesByUser,getFecha,recibirhojaPresupuesto, showRequisPresupuestoAprobacion, showRequisAdquisiciones, recibirhojaAdquisiciones, showRequisAdquisicionesAprobacion, aprobarEnAdquisiciones, showRequiByIdAdquisiciones, showRequiByIdAdquisicionesAprobaciones, showMovimientosByIdEdit, editRequi, showHistorialById, showAllRequis, showRequisDirector, showRequiDirectorById, getDetailsToEdit } from "../controllers/requis/requi.controller";
 import { authJwt } from "../middlewares";
 import { getDirectores, getRoles, getDepartamentos, getUsuarios, addSolicitante } from "../controllers/data/extraData";
-import { createVale,infoProveedor, infoProveedorById, showMovimientosValeById, getMovimientosVale, showValeById } from "../controllers/vales/vales.controller";
+import { createVale,infoProveedor, infoProveedorById, showMovimientosValeById, getMovimientosVale, showValeById, getProveedoresValeByNombre } from "../controllers/vales/vales.controller";
 import { getMovimientosEstudio,getProveedoresEstudio } from '../controllers/estudio/estudio.controller';
 import { programarLicitacion } from '../controllers/licitacion/licitacion';
 
@@ -92,6 +92,9 @@ router.post('/addSolicitante',authJwt.verifyToken,authJwt.isAdmin,addSolicitante
 
 //Licitaciones
 router.post('/programarLicitacion',authJwt.verifyToken,programarLicitacion)
+
+//Vales
+router.post('getProveedoresValesByNombre',authJwt.verifyToken,authJwt.isAdquisiciones,getProveedoresValeByNombre)
 
 
 export default router;
