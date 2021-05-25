@@ -29,7 +29,7 @@ export const createRequi=async(req:Request,res:Response):Promise<Response>=>{
         //cambiar por select para obtener el id de la requi creada
         const idNuevaRequi = requi[0].insertId;
         movimientos.map(async(requi:any,index:number)=>{
-         const movi = await conn.query('INSERT INTO movimiento (idMovimiento,descripcion,cantidad,Unidades_idUnidades,Requisiciones_idRequisiciones) values(default,?,?,?,?)',[requi.descripcion,requi.cantidad,requi.unidades,idNuevaRequi]);
+         const movi = await conn.query('INSERT INTO movimiento (idMovimiento,descripcion,cantidad,Unidades_idUnidades,Requisiciones_idRequisiciones,cUnitarioAprox) values(default,?,?,?,?,?)',[requi.descripcion,requi.cantidad,requi.unidades,idNuevaRequi,requi.cUnitarioAprox]);
        })
 
        //Añadir al historial el movimiento realizado
