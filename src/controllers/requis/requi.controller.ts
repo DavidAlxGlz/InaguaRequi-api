@@ -623,7 +623,7 @@ export const showMovimientosById = async(req:Request,res:Response):Promise<Respo
   const idRequi = req.body.idRequi;
   try {
     const con = await connect();
-    const movs:any = await con.query('SELECT idMovimiento,descripcion,cantidad,Unidades_idUnidades from movimiento where Requisiciones_idRequisiciones = ?',[idRequi]);
+    const movs:any = await con.query('SELECT idMovimiento,descripcion,cantidad,Unidades_idUnidades,cUnitarioAprox from movimiento where Requisiciones_idRequisiciones = ?',[idRequi]);
     con.end();
     if(movs[0].length === 0){return res.status(204).json('')}
     return res.status(200).json(movs[0])
