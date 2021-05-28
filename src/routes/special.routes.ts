@@ -9,6 +9,7 @@ import { getDirectores, getRoles, getDepartamentos, getUsuarios, addSolicitante 
 import { createVale,infoProveedor, infoProveedorById, showMovimientosValeById, getMovimientosVale, showValeById, getProveedoresValeByNombre } from "../controllers/vales/vales.controller";
 import { getMovimientosEstudio,getProveedoresEstudio } from '../controllers/estudio/estudio.controller';
 import { programarLicitacion } from '../controllers/licitacion/licitacion';
+import { getProveedores } from '../controllers/proveedores/proveedores';
 
 router.post('/signup',signUp);
 router.post('/createRequi',authJwt.verifyToken,authJwt.isUsuario,createRequi)
@@ -62,6 +63,9 @@ router.post('/infoProveedorById',authJwt.verifyToken,authJwt.isAdquisiciones,inf
 router.post('/showMovimientosValeById',authJwt.verifyToken,authJwt.isAdquisiciones,showMovimientosValeById)
 router.post('/getMovimientosVale',authJwt.verifyToken,authJwt.isAdquisiciones,getMovimientosVale)
 router.post('/showValebyId',authJwt.verifyToken,authJwt.isAdquisiciones,showValeById)
+
+//Proveedores
+router.get('/getProveedores',authJwt.verifyToken,authJwt.isAdquisiciones,getProveedores)
 
 //rechazadas
 router.get('/requisRechazadas',authJwt.verifyToken,authJwt.isUsuario,showRequisUsuarioRechazadas)
