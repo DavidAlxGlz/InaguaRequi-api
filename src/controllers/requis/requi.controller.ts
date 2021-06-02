@@ -266,6 +266,18 @@ export const showRequisAdquisicionesAprobacion =async(req:Request,res:Response):
     }
 }
 
+//ver todas las requisiciones Caja Chica para aprobar
+export const showRequisCajaChicaAprobacion =async(req:Request,res:Response):Promise<Response>=>{
+  try {
+      const conn = await connect();
+      const requis = await conn.query('SELECT idRequisiciones,fecha,justificacion,requiriente.nombre as NomRequiriente, requiriente.apellido as ApeRequiriente, centrocosto.centroCosto,CCdepartamento.departamento as CCdepartamento, CCdireccion.direccion as CCdireccion,centroCosto,bienesOServicios,requi.estado,DptoUsuario.departamento FROM inagua_requis.requisiciones as requi inner join usuarios as requiriente on requiriente.idUsuarios = requi.Usuarios_requiriente inner join usuarios as usuario on usuario.idUsuarios = requi.Usuarios_idUsuarios inner join centrocosto on centrocosto.idCentroCosto = requi.CentroCosto_idCentroCosto inner join departamentos as CCdepartamento on CCdepartamento.idDepartamentos = centrocosto.Departamentos_idDepartamentos inner join direcciones as CCdireccion on CCdireccion.idDirecciones = CCdepartamento.Direcciones_idDirecciones inner join departamentos as DptoUsuario on DptoUsuario.idDepartamentos = usuario.Departamentos_idDepartamentos where requi.estado = 7 order by idRequisiciones desc;');
+      conn.end()
+     return res.status(200).json(requis[0])
+    } catch (error) {
+      return res.status(401).json({ message: 'no autorizado' }) 
+    }
+}
+
 //Recibir hoja en presupuesto
 export const recibirhojaPresupuesto = async(req:Request,res:Response):Promise<Response>=>{
   if(!req.body || !req.header){
@@ -313,6 +325,35 @@ const pool = await connect();
     await con.beginTransaction();
     const update = await con.query('UPDATE requisiciones SET estado = 4 where idRequisiciones = ?',[arr.idRequi]);
     const addHistory = await con.query('INSERT INTO historial(idhistorial,Usuarios_idUsuarios,Requisiciones_idRequisiciones,comentarios,nuevoEstado) values(default,?,?,?,?)',[decoded.id,arr.idRequi,'Hoja recibida en Adquisiciones',4])
+    await con.commit();
+    pool.end()
+    return res.status(200).json({msg:'actualizado'})
+  } catch (error) {
+    if (con) await con.rollback();
+        pool.end();
+        return res.send(error)
+        throw error;
+  }
+}
+
+//Recibir hoja en Adquisiciones
+export const recibirhojaCajaChica = async(req:Request,res:Response):Promise<Response>=>{
+  if(!req.body || !req.header){
+    return res.status(400).json({ msg: 'Envia toda la informacion' })
+}
+console.log(req.body.idRequi)
+let con:any =null;
+const pool = await connect();
+  try {
+    const toke = req.headers["x-access-token"]?.toString();
+    if(!toke) return res.status(403).json({ message: "sin token" })
+    const decoded:any = jwt.verify(toke,config.SECRET);
+    if(!decoded) return res.status(404).json({ message:' token invalido ' })
+    const arr = req.body;
+    con = await pool.getConnection();
+    await con.beginTransaction();
+    const update = await con.query('UPDATE requisiciones SET estado = 7 where idRequisiciones = ?',[arr.idRequi]);
+    const addHistory = await con.query('INSERT INTO historial(idhistorial,Usuarios_idUsuarios,Requisiciones_idRequisiciones,comentarios,nuevoEstado) values(default,?,?,?,?)',[decoded.id,arr.idRequi,'Hoja recibida en Caja Chica',7])
     await con.commit();
     pool.end()
     return res.status(200).json({msg:'actualizado'})
@@ -439,6 +480,41 @@ const pool = await connect();
   }
 }
 
+export const rechazarEnCajaChica = async(req:Request,res:Response):Promise<Response>=>{
+  if(!req.body || !req.header){
+    return res.status(400).json({ msg: 'Envia toda la informacion' })
+}
+let con:any =null;
+let msg:any='';
+const pool = await connect();
+  try {
+    const toke = req.headers["x-access-token"]?.toString();
+    if(!toke) return res.status(403).json({ message: "sin token" })
+    const decoded:any = jwt.verify(toke,config.SECRET);
+    if(!decoded) return res.status(404).json({ message:' token invalido ' })
+    const arr = req.body;
+    con = await pool.getConnection();
+    await con.beginTransaction();
+    const estadoActual = await con.query('Select estado from requisiciones where idRequisiciones = ?',[arr.idRequi])
+    console.log(estadoActual[0][0].estado)
+    if(estadoActual[0][0].estado === 7){
+      const update = await con.query('UPDATE requisiciones SET estado = 0 where idRequisiciones = ?',[arr.idRequi]);
+      const addHistory = await con.query('INSERT INTO historial(idhistorial,Usuarios_idUsuarios,Requisiciones_idRequisiciones,comentarios,nuevoEstado) values(default,?,?,?,?)',[decoded.id,arr.idRequi,arr.msgRechazo,0])
+      await con.commit();
+      msg='Rechazo realizado con éxito'
+    }else{
+      msg='Error al realizar el rechazo'
+    }
+    pool.end()
+    return res.status(200).json({msg:msg})
+  } catch (error) {
+    if (con) await con.rollback();
+        pool.end();
+        return res.send(error)
+        throw error;
+  }
+}
+
 
 //ver todas las requisiciones de un usuario
 export const showRequisByUser =async(req:Request,res:Response):Promise<Response>=>{
@@ -525,6 +601,20 @@ export const showRequiByIdAdquisicionesAprobaciones =async(req:Request,res:Respo
   try {
     const conn = await connect();
     const requi = await conn.query('Select requi.idRequisiciones,requi.fecha,requi.justificacion,requiriente.nombre as NomRequiriente,bienesOServicios, requiriente.apellido as ApeRequiriente, centrocosto.centroCosto,CCdepartamento.departamento as CCdepartamento, CCdireccion.direccion as CCdireccion,director.nombre as NomDirector, director.apellido as ApeDirector from requisiciones as requi inner join usuarios as requiriente on requiriente.idUsuarios = requi.Usuarios_requiriente inner join usuarios as usuario on usuario.idUsuarios = requi.Usuarios_idUsuarios inner join centrocosto on centrocosto.idCentroCosto = requi.CentroCosto_idCentroCosto inner join departamentos as CCdepartamento on CCdepartamento.idDepartamentos = centrocosto.Departamentos_idDepartamentos inner join direcciones as CCdireccion on CCdireccion.idDirecciones = CCdepartamento.Direcciones_idDirecciones inner join directores as director on director.idDirectores = requi.Directores_idDirectores where requi.idRequisiciones = ? and estado = 4',[idRequi]);
+    conn.end()
+   return res.status(200).json(requi[0])
+  } catch (error) {
+    return res.status(401).json(error) 
+  }
+}
+
+//ver una sola requisicion por id ( Caja chica aprobaciones )
+export const showRequiByIdCajaChicaAprobaciones =async(req:Request,res:Response):Promise<Response>=>{
+  if(!req.body){ res.status(400).json({msg: 'envia toda la informacion'})}
+  const idRequi = req.body.idRequi;
+  try {
+    const conn = await connect();
+    const requi = await conn.query('Select requi.idRequisiciones,requi.fecha,requi.justificacion,requiriente.nombre as NomRequiriente,bienesOServicios, requiriente.apellido as ApeRequiriente, centrocosto.centroCosto,CCdepartamento.departamento as CCdepartamento, CCdireccion.direccion as CCdireccion,director.nombre as NomDirector, director.apellido as ApeDirector from requisiciones as requi inner join usuarios as requiriente on requiriente.idUsuarios = requi.Usuarios_requiriente inner join usuarios as usuario on usuario.idUsuarios = requi.Usuarios_idUsuarios inner join centrocosto on centrocosto.idCentroCosto = requi.CentroCosto_idCentroCosto inner join departamentos as CCdepartamento on CCdepartamento.idDepartamentos = centrocosto.Departamentos_idDepartamentos inner join direcciones as CCdireccion on CCdireccion.idDirecciones = CCdepartamento.Direcciones_idDirecciones inner join directores as director on director.idDirectores = requi.Directores_idDirectores where requi.idRequisiciones = ? and estado = 7',[idRequi]);
     conn.end()
    return res.status(200).json(requi[0])
   } catch (error) {
