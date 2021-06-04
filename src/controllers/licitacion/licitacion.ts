@@ -19,8 +19,6 @@ export const programarLicitacion =async(req:Request,res:Response):Promise<Respon
         conn = await pool.getConnection();
         await conn.beginTransaction();
         const response:any = await conn.query('INSERT INTO licitaciones (idLicitaciones,Requisiciones_idRequisiciones,fecha_programada) values(default,?,?)',[arr.idRequisicion,arr.fechaProgramada]);
-        console.log(response[0].insertId)
-        console.log(response)
         if(response[0].insertId){
           //Añadir al historial
           const histo = await conn.query('INSERT INTO historial(idhistorial,Usuarios_idUsuarios,Requisiciones_idRequisiciones,comentarios,nuevoEstado) values(default,?,?,?,?)',[decoded.id,arr.idRequisicion,`Licitacion programada para ${arr.fechaProgramada}`,4]);

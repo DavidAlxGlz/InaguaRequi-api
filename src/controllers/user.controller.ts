@@ -50,7 +50,7 @@ export const signIn = async (req:Request,res:Response):Promise<Response> =>{
         expiresIn:28800 //8 horas
     })
     conn.end()
-   
+    console.log(`INICIO DE SESION --> ${usuarioT}`)
     return res.json({token})
 }
 
