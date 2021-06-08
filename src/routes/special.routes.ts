@@ -9,7 +9,7 @@ import { getDirectores, getRoles, getDepartamentos, getUsuarios, addSolicitante 
 import { createVale,infoProveedor, infoProveedorById, showMovimientosValeById, getMovimientosVale, showValeById, getProveedoresValeByNombre } from "../controllers/vales/vales.controller";
 import { getMovimientosEstudio,getProveedoresEstudio } from '../controllers/estudio/estudio.controller';
 import { programarLicitacion } from '../controllers/licitacion/licitacion';
-import { getProveedores } from '../controllers/proveedores/proveedores';
+import { getProveedores, insertProveedor } from '../controllers/proveedores/proveedores';
 
 router.post('/signup',signUp);
 router.post('/createRequi',authJwt.verifyToken,authJwt.isUsuario,createRequi)
@@ -73,6 +73,7 @@ router.post('/aprobarEnCajaChica',authJwt.verifyToken,aprobarEnCajaChica)
 
 //Proveedores
 router.get('/getProveedores',authJwt.verifyToken,authJwt.isAdquisiciones,getProveedores)
+router.post('/insertProveedores',authJwt.verifyToken,authJwt.isAdquisiciones,insertProveedor)
 
 //rechazadas
 router.get('/requisRechazadas',authJwt.verifyToken,authJwt.isUsuario,showRequisUsuarioRechazadas)

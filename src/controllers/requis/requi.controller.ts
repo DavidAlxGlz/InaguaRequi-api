@@ -31,7 +31,7 @@ export const createRequi=async(req:Request,res:Response):Promise<Response>=>{
       const CC:any = await conn.query('SELECT idCentroCosto from centrocosto where centroCosto = ?',[arr.CentroCosto_idCentroCosto]);
       const idCC = CC[0][0].idCentroCosto;
       await conn.beginTransaction();
-      const requi:any = await conn.query(`INSERT INTO requisiciones(idRequisiciones,fecha,justificacion,Usuarios_idUsuarios,CentroCosto_idCentroCosto,Directores_idDirectores,bienesOServicios,Usuarios_requiriente,estado,gastoCorriente,recursoPropio,recursoOtros,descOtros) values(default,?,?,?,?,?,?,?,?,?,?,?,?)`,[arr.fecha,arr.justificacion,decoded.id,idCC,arr.Directores_idDirectores,arr.bienesOServicios,arr.Usuarios_requiriente,arr.estado,arr.gastoCorriente,arr.recursoPropio,arr.recursoOtros,arr.descOtros]);
+      const requi:any = await conn.query(`INSERT INTO requisiciones(idRequisiciones,fecha,justificacion,Usuarios_idUsuarios,CentroCosto_idCentroCosto,Directores_idDirectores,bienesOServicios,Usuarios_requiriente,estado,gastoCorriente,recursoPropio,recursoOtros,descOtros) values(default,default,?,?,?,?,?,?,?,?,?,?,?)`,[arr.justificacion,decoded.id,idCC,arr.Directores_idDirectores,arr.bienesOServicios,arr.Usuarios_requiriente,arr.estado,arr.gastoCorriente,arr.recursoPropio,arr.recursoOtros,arr.descOtros]);
 
       //cambiar por select para obtener el id de la requi creada
       const idNuevaRequi = requi[0].insertId;
@@ -127,6 +127,9 @@ export const showHistorialById =async(req:Request,res:Response)=>{
       conn = await pool.getConnection();
       const hist = await conn.query('select idhistorial,Usuarios_idUsuarios,comentarios,nuevoEstado,fecha,idUsuarios,nombre,apellido from historial join usuarios as usuario on usuario.idUsuarios = historial.Usuarios_idUsuarios where Requisiciones_idRequisiciones = ? order by fecha desc',[arr.idRequi]);
       pool.end()
+      const local = new Date(hist[0][0].fecha)
+      console.log(local)
+      console.log(hist[0])
       return res.status(200).json(hist[0])
   } catch (error) {
       pool.end()
