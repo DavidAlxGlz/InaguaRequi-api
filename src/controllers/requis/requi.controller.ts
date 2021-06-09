@@ -978,3 +978,22 @@ export const finalizarEntrega = async(req:Request,res:Response):Promise<Response
         throw error;
   }
 }
+
+//historial by user (filtro estado)
+export const historialByUsuario = async(req:Request,res:Response):Promise<Response>=>{
+  if(!req.body || !req.header){ res.status(400).json({msg: 'envia toda la informacion'})}
+  const con = await connect();
+  try {
+    const estado = req.body.Nestado;
+    const toke = req.headers["x-access-token"]?.toString();
+    if(!toke) return res.status(403).json({ message: "sin token" })
+    const decoded:any = jwt.verify(toke,config.SECRET);
+    if(!decoded) return res.status(404).json({ message:' token invalido ' })
+    const response:any = await con.query('Select * from historial where (Usuarios_idUsuarios = ? and nuevoEstado = ?)',[decoded.id,estado]);
+    con.end();
+    return res.status(200).json(response[0])
+  } catch (error) {
+    con.end()
+    return res.status(401).json(error) 
+  }
+}
