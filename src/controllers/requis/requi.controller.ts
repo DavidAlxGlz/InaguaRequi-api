@@ -989,7 +989,7 @@ export const historialByUsuario = async(req:Request,res:Response):Promise<Respon
     if(!toke) return res.status(403).json({ message: "sin token" })
     const decoded:any = jwt.verify(toke,config.SECRET);
     if(!decoded) return res.status(404).json({ message:' token invalido ' })
-    const response:any = await con.query('Select * from historial where (Usuarios_idUsuarios = ? and nuevoEstado = ?)',[decoded.id,estado]);
+    const response:any = await con.query('Select * from historial where (Usuarios_idUsuarios = ? and nuevoEstado = ?) order by fecha desc',[decoded.id,estado]);
     con.end();
     return res.status(200).json(response[0])
   } catch (error) {
