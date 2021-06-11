@@ -7,7 +7,6 @@ export const getMovimientosEstudio = async(req:Request,res:Response):Promise<Res
         return res.status(400).json({ msg: 'Envia toda la informacion' })
     }
     const requi = req.body.idRequi;
-    console.log(requi)
     try {
       const con = await connect();
       const response = await con.query('select * from movimiento where Requisiciones_idRequisiciones = ?',[requi]);

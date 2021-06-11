@@ -127,9 +127,6 @@ export const showHistorialById =async(req:Request,res:Response)=>{
       conn = await pool.getConnection();
       const hist = await conn.query('select idhistorial,Usuarios_idUsuarios,comentarios,nuevoEstado,fecha,idUsuarios,nombre,apellido from historial join usuarios as usuario on usuario.idUsuarios = historial.Usuarios_idUsuarios where Requisiciones_idRequisiciones = ? order by fecha desc',[arr.idRequi]);
       pool.end()
-      const local = new Date(hist[0][0].fecha)
-      console.log(local)
-      console.log(hist[0])
       return res.status(200).json(hist[0])
   } catch (error) {
       pool.end()

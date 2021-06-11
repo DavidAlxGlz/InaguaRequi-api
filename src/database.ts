@@ -5,7 +5,7 @@ export async function connect(){
    const connection = await createPool({
         host: 'localhost',
         user: 'root',
-        password: 'Inagua2021',
+        password: '2602754',
         database: 'inagua_requis',
     });
     

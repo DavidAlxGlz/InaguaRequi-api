@@ -26,7 +26,6 @@ export const insertProveedor =async(req:Request,res:Response):Promise<Response>=
         return res.status(400).json({ msg: 'Envia toda la informacion' })
     }
     const proveedor = req.body;
-    console.log(proveedor)
     let conn:any =null;
     const pool = await connect();
     try {

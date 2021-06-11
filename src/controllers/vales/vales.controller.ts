@@ -19,15 +19,14 @@ export const createVale =async(req:Request,res:Response):Promise<Response>=>{
     await conn.beginTransaction();
     const vale:any = await conn.query('INSERT INTO vales(idVales,Proveedores_idProveedor,Requisiciones_idRequisiciones,fecha,autoriza_idUsuarios) values(default,?,?,?,?)',[arr.Proveedores_idProveedor,arr.Requisiciones_idRequisiciones,arr.fecha,decoded.id]);
     //cambiar por select para obtener el id del vale creado
-    console.log(vale)
     const idNuevoVale = vale[0].insertId
     const movimientos = arr.movimientos;
     movimientos.map(async(mov:any,index:number)=>{
     //update movimientos | Vales_idVales
-    console.log(mov.idMovimiento)
         await conn.query('UPDATE movimiento set Vales_idVales = ? where idMovimiento = ?',[idNuevoVale,mov.idMovimiento])
     })
     await conn.commit();
+    console.log(`Vale creado --> idUsuario: ${decoded.id}`)
     pool.end();
     return res.status(200).json(vale)
     } catch (error) {
@@ -58,7 +57,6 @@ export const infoProveedorById=async(req:Request,res:Response):Promise<Response>
         const conn = await connect();
         const proveedor:any = await conn.query('SELECT * from proveedores where idProveedor = ?',[idProveedor]);
         conn.end()
-        console.log(proveedor[0])
         if(proveedor[0].length === 0){return res.status(204).json({})}
         return res.status(200).json(proveedor[0])
     } catch (error) {
@@ -90,7 +88,6 @@ export const showMovimientosValeById = async(req:Request,res:Response):Promise<R
       const con = await connect();
       const movs:any = await con.query('SELECT idMovimiento,descripcion,cantidad,Unidades_idUnidades from movimiento where Requisiciones_idRequisiciones = ?',[idRequi]);
       con.end();
-      console.log(movs[0].length)
       if(movs[0].length === 0){return res.status(204).json('')}
       return res.status(200).json(movs[0])
     } catch (error) {

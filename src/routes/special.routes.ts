@@ -10,6 +10,7 @@ import { createVale,infoProveedor, infoProveedorById, showMovimientosValeById, g
 import { getMovimientosEstudio,getProveedoresEstudio } from '../controllers/estudio/estudio.controller';
 import { programarLicitacion } from '../controllers/licitacion/licitacion';
 import { getProveedores, insertProveedor } from '../controllers/proveedores/proveedores';
+import { requisicionPedido, showMovimientosByIdPedido } from '../controllers/pedido/pedido';
 
 router.post('/signup',signUp);
 router.post('/createRequi',authJwt.verifyToken,authJwt.isUsuario,createRequi)
@@ -110,6 +111,11 @@ router.post('getProveedoresValesByNombre',authJwt.verifyToken,authJwt.isAdquisic
 
 //sin verificar rol ya que cualquier area puede verlo
 router.post('/historialByUsuario',authJwt.verifyToken,historialByUsuario)
+
+//pedidos
+router.post('/requisicionPedido',authJwt.verifyToken,requisicionPedido)
+router.post('/showMovimientosByIdPedido',authJwt.verifyToken,authJwt.isUsuario,showMovimientosByIdPedido)
+
 
 export default router;
 
