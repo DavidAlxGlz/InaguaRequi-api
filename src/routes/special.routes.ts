@@ -10,7 +10,7 @@ import { createVale,infoProveedor, infoProveedorById, showMovimientosValeById, g
 import { getMovimientosEstudio,getProveedoresEstudio } from '../controllers/estudio/estudio.controller';
 import { programarLicitacion } from '../controllers/licitacion/licitacion';
 import { getProveedores, insertProveedor } from '../controllers/proveedores/proveedores';
-import { requisicionPedido, showMovimientosByIdPedido } from '../controllers/pedido/pedido';
+import { createPedido, misPedidos, requisicionPedido, showMovimientosByIdPedido } from '../controllers/pedido/pedido';
 
 router.post('/signup',signUp);
 router.post('/createRequi',authJwt.verifyToken,authJwt.isUsuario,createRequi)
@@ -115,6 +115,8 @@ router.post('/historialByUsuario',authJwt.verifyToken,historialByUsuario)
 //pedidos
 router.post('/requisicionPedido',authJwt.verifyToken,requisicionPedido)
 router.post('/showMovimientosByIdPedido',authJwt.verifyToken,authJwt.isUsuario,showMovimientosByIdPedido)
+router.post('/createPedido',authJwt.verifyToken,createPedido)
+router.get('/misPedidos',authJwt.verifyToken,misPedidos)
 
 
 export default router;
