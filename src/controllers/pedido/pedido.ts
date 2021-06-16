@@ -73,7 +73,7 @@ export const createPedido=async(req:Request,res:Response):Promise<Response>=>{
   if(!req.body || !req.header){
     return res.status(400).json({ msg: 'Envia toda la informacion' })
   }
-
+console.log(req.body)
   let conn:any =null;
   const pool = await connect();
 
@@ -112,7 +112,35 @@ export const createPedido=async(req:Request,res:Response):Promise<Response>=>{
       } catch (error) {
         if (conn) await conn.rollback();
         pool.end();
+        console.log(error)
         return res.status(400).send(error)
         throw error;
       } 
+}
+
+export const pedidoDetalles =async(req:Request,res:Response):Promise<Response>=>{
+  if(!req.body || !req.header){
+      return res.status(400).json({ msg: 'Envia toda la informacion' })
+  }
+  let conn:any =null;
+  const pool = await connect();
+  const info = req.body;
+  try {
+  const toke = req.headers["x-access-token"]?.toString();
+  if(!toke) return res.status(403).json({ message: "sin token" })
+  const decoded:any = jwt.verify(toke,config.SECRET);
+  if(!decoded) return res.status(404).json({ message:' token invalido ' })
+  const arr = req.body;
+      conn = await pool.getConnection();
+      const resPedido:any = await conn.query('Select * from pedido where idpedido = ? and idUsuarios = ?',[info.idpedido,decoded.id]);
+       
+      const resMovimientos:any = await conn.query('Select * from movimiento where idpedido = ?',[info.idpedido]);
+      resPedido[0][0].movimientos = resMovimientos[0]
+      pool.end()
+      return res.status(200).json(resPedido[0])
+    } catch (error) {
+      pool.end();
+      return res.status(400).send(error)
+      throw error;
+    } 
 }
