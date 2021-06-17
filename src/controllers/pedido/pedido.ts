@@ -132,8 +132,7 @@ export const pedidoDetalles =async(req:Request,res:Response):Promise<Response>=>
   if(!decoded) return res.status(404).json({ message:' token invalido ' })
   const arr = req.body;
       conn = await pool.getConnection();
-      const resPedido:any = await conn.query('Select * from pedido where idpedido = ? and idUsuarios = ?',[info.idpedido,decoded.id]);
-       
+      const resPedido:any = await conn.query('Select idpedido,proveedor,NPadronProveedor,domicilio,pedido.telefono,pedido.email,contacto,plazoEntrega,lugarEntrega,fuenteFinanciamiento,periodoGarantia,emailRequiriente,extensionRequiriente,requisiciones_idRequisiciones,idRequiriente,pedido.idUsuarios,subtotal,iva,fecha, usu.nombre as RNombre,usu.apellido as RApellido,usu.email as REmail, usu.telefono as RTelefono from pedido join usuarios as usu on usu.idUsuarios = pedido.idRequiriente where idpedido = ? and pedido.idUsuarios = ?',[info.idpedido,decoded.id]);
       const resMovimientos:any = await conn.query('Select * from movimiento where idpedido = ?',[info.idpedido]);
       resPedido[0][0].movimientos = resMovimientos[0]
       pool.end()
