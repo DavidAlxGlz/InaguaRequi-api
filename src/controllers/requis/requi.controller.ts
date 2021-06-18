@@ -955,7 +955,7 @@ export const finalizarEntrega = async(req:Request,res:Response):Promise<Response
       const addHistory = await con.query('INSERT INTO historial(idhistorial,Usuarios_idUsuarios,Requisiciones_idRequisiciones,comentarios,nuevoEstado) values(default,?,?,?,?)',[decoded.id,arr.idRequi,'Requisición Finalizada Satisfactoriamente "Finalizada por Adquisiciones"',6])
       await con.commit();
       msg= "successAD"
-      console.log(`fINALIZAR EN ADQUISICIONES: ID Usuario --> ${decoded.id} | REQUISICION: ${arr.idRequi} | Time: ${new Date()}`)
+      console.log(`FINALIZAR EN ADQUISICIONES: ID Usuario --> ${decoded.id} | REQUISICION: ${arr.idRequi} | Time: ${new Date()}`)
 
     }
     if(getEstado[0][0].estado === 8){
@@ -964,7 +964,7 @@ export const finalizarEntrega = async(req:Request,res:Response):Promise<Response
       const addHistory = await con.query('INSERT INTO historial(idhistorial,Usuarios_idUsuarios,Requisiciones_idRequisiciones,comentarios,nuevoEstado) values(default,?,?,?,?)',[decoded.id,arr.idRequi,'Requisición Finalizada Satisfactoriamente "Finalizada por Caja Chica"',9])
       await con.commit();
       msg = "successCC"
-      console.log(`fINALIZAR EN CAJA CHICA: ID Usuario --> ${decoded.id} | REQUISICION: ${arr.idRequi} | Time: ${new Date()}`)
+      console.log(`FINALIZAR EN CAJA CHICA: ID Usuario --> ${decoded.id} | REQUISICION: ${arr.idRequi} | Time: ${new Date()}`)
     }
     pool.end()
     return res.status(200).json({msg:msg})
