@@ -11,6 +11,7 @@ import { getMovimientosEstudio,getProveedoresEstudio } from '../controllers/estu
 import { programarLicitacion } from '../controllers/licitacion/licitacion';
 import { getProveedores, insertProveedor } from '../controllers/proveedores/proveedores';
 import { createPedido, misPedidos, pedidoDetalles, requisicionPedido, showMovimientosByIdPedido } from '../controllers/pedido/pedido';
+import { infoMainDashboard } from '../controllers/charts/main.controller';
 
 router.post('/signup',signUp);
 router.post('/createRequi',authJwt.verifyToken,authJwt.isUsuario,createRequi)
@@ -118,6 +119,9 @@ router.post('/showMovimientosByIdPedido',authJwt.verifyToken,authJwt.isUsuario,s
 router.post('/createPedido',authJwt.verifyToken,createPedido)
 router.get('/misPedidos',authJwt.verifyToken,misPedidos)
 router.post('/pedidoDetalles',authJwt.verifyToken,pedidoDetalles)
+
+//chart
+router.get('/infoMainDashboard',infoMainDashboard)
 
 
 export default router;

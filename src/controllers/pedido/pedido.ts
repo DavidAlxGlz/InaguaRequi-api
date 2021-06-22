@@ -73,7 +73,6 @@ export const createPedido=async(req:Request,res:Response):Promise<Response>=>{
   if(!req.body || !req.header){
     return res.status(400).json({ msg: 'Envia toda la informacion' })
   }
-console.log(req.body)
   let conn:any =null;
   const pool = await connect();
 
