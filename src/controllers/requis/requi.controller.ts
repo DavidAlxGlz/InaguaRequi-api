@@ -634,6 +634,12 @@ const pool = await connect();
 
 
 //ver todas las requisiciones de un usuario
+
+//antigua consulta
+
+//SELECT idRequisiciones,fecha,justificacion,requiriente.nombre as NomRequiriente, requiriente.apellido as ApeRequiriente, centrocosto.centroCosto,CCdepartamento.departamento as CCdepartamento, CCdireccion.direccion as CCdireccion,centroCosto,bienesOServicios, requi.estado FROM inagua_requis.requisiciones as requi inner join usuarios as requiriente on requiriente.idUsuarios = requi.Usuarios_requiriente inner join usuarios as usuario on usuario.idUsuarios = requi.Usuarios_idUsuarios inner join centrocosto on centrocosto.idCentroCosto = requi.CentroCosto_idCentroCosto inner join departamentos as CCdepartamento on CCdepartamento.idDepartamentos = centrocosto.Departamentos_idDepartamentos inner join direcciones as CCdireccion on CCdireccion.idDirecciones = CCdepartamento.Direcciones_idDirecciones where usuario.idUsuarios = ? order by idRequisiciones desc;
+
+
 export const showRequisByUser =async(req:Request,res:Response):Promise<Response>=>{
   const conn = await connect();
   try {
@@ -641,7 +647,7 @@ export const showRequisByUser =async(req:Request,res:Response):Promise<Response>
     if(!toke) return res.status(403).json({ message: "sin token" })
     const decoded:any = jwt.verify(toke,config.SECRET);
     if(!decoded) return res.status(404).json({ message:' token invalido ' })
-    const requis = await conn.query('SELECT idRequisiciones,fecha,justificacion,requiriente.nombre as NomRequiriente, requiriente.apellido as ApeRequiriente, centrocosto.centroCosto,CCdepartamento.departamento as CCdepartamento, CCdireccion.direccion as CCdireccion,centroCosto,bienesOServicios, requi.estado FROM inagua_requis.requisiciones as requi inner join usuarios as requiriente on requiriente.idUsuarios = requi.Usuarios_requiriente inner join usuarios as usuario on usuario.idUsuarios = requi.Usuarios_idUsuarios inner join centrocosto on centrocosto.idCentroCosto = requi.CentroCosto_idCentroCosto inner join departamentos as CCdepartamento on CCdepartamento.idDepartamentos = centrocosto.Departamentos_idDepartamentos inner join direcciones as CCdireccion on CCdireccion.idDirecciones = CCdepartamento.Direcciones_idDirecciones where usuario.idUsuarios = ? order by idRequisiciones desc;',[decoded.id])
+    const requis = await conn.query('SELECT  requi.idRequisiciones,requi.fecha,requi.justificacion,requiriente.nombre as NomRequiriente, requiriente.apellido as ApeRequiriente, centrocosto.centroCosto,CCdepartamento.departamento as CCdepartamento, CCdireccion.direccion as CCdireccion,centroCosto,bienesOServicios, requi.estado,datediff(now(),c.fecha) as lastF FROM requisiciones requi INNER JOIN historial c ON requi.idRequisiciones = c.Requisiciones_idRequisiciones INNER JOIN ( SELECT Requisiciones_idRequisiciones, MAX(fecha) maxDate FROM historial GROUP BY Requisiciones_idRequisiciones ) b ON c.Requisiciones_idRequisiciones = b.Requisiciones_idRequisiciones AND c.fecha = b.maxDate inner join usuarios as requiriente on requiriente.idUsuarios = requi.Usuarios_requiriente inner join usuarios as usuario on usuario.idUsuarios = requi.Usuarios_idUsuarios inner join centrocosto on centrocosto.idCentroCosto = requi.CentroCosto_idCentroCosto inner join departamentos as CCdepartamento on CCdepartamento.idDepartamentos = centrocosto.Departamentos_idDepartamentos inner join direcciones as CCdireccion on CCdireccion.idDirecciones = CCdepartamento.Direcciones_idDirecciones WHERE requi.Usuarios_idUsuarios = ? order by requi.idRequisiciones desc',[decoded.id])
     conn.end()
     return res.status(200).json(requis[0])
   } catch (error) {
