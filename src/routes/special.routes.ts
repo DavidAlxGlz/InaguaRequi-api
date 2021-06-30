@@ -3,7 +3,7 @@ import {Router} from 'express';
 const router = Router();
 
 import {  signUp,getRolByToken } from "../controllers/user.controller";
-import { createRequi,finalizarEntrega,findUserRequiByIdAprobadas,showRequisUsuarioAprobadas,infoUsuario,showLastRechazoByIdRequi,rechazarEnAdquisiciones,rechazarEnPresupuesto,showRequisPresupuesto,showRequiByIdHistorial,showRequiByIdDetailsUsuario,aprobarEnPresupuesto,showRequiByIdPresupuesto,showRequiByIdPresupuestoAprobaciones,showRequiByIdDetailsPresupuesto,showRequisUsuarioRechazadas, showMovimientosById, showRequisByUser, showRequisByDepartamentoUsuario,findUserRequiById,solicitantesByUser,getFecha,recibirhojaPresupuesto, showRequisPresupuestoAprobacion, showRequisAdquisiciones, recibirhojaAdquisiciones, showRequisAdquisicionesAprobacion, aprobarEnAdquisiciones, showRequiByIdAdquisiciones, showRequiByIdAdquisicionesAprobaciones, showMovimientosByIdEdit, editRequi, showHistorialById, showAllRequis, showRequisDirector, showRequiDirectorById, getDetailsToEdit, recibirhojaCajaChica, showRequisCajaChicaAprobacion, showRequiByIdCajaChicaAprobaciones, rechazarEnCajaChica, aprobarEnCajaChica, historialByUsuario } from "../controllers/requis/requi.controller";
+import { createRequi,finalizarEntrega,findUserRequiByIdAprobadas,showRequisUsuarioAprobadas,infoUsuario,showLastRechazoByIdRequi,rechazarEnAdquisiciones,rechazarEnPresupuesto,showRequisPresupuesto,showRequiByIdHistorial,showRequiByIdDetailsUsuario,aprobarEnPresupuesto,showRequiByIdPresupuesto,showRequiByIdPresupuestoAprobaciones,showRequiByIdDetailsPresupuesto,showRequisUsuarioRechazadas, showMovimientosById, showRequisByUser, showRequisByDepartamentoUsuario,findUserRequiById,solicitantesByUser,getFecha,recibirhojaPresupuesto, showRequisPresupuestoAprobacion, showRequisAdquisiciones, recibirhojaAdquisiciones, showRequisAdquisicionesAprobacion, aprobarEnAdquisiciones, showRequiByIdAdquisiciones, showRequiByIdAdquisicionesAprobaciones, showMovimientosByIdEdit, editRequi, showHistorialById, showAllRequis, showRequisDirector, showRequiDirectorById, getDetailsToEdit, recibirhojaCajaChica, showRequisCajaChicaAprobacion, showRequiByIdCajaChicaAprobaciones, rechazarEnCajaChica, aprobarEnCajaChica, historialByUsuario, vehiculos, plantas } from "../controllers/requis/requi.controller";
 import { authJwt } from "../middlewares";
 import { getDirectores, getRoles, getDepartamentos, getUsuarios, addSolicitante } from "../controllers/data/extraData";
 import { createVale,infoProveedor, infoProveedorById, showMovimientosValeById, getMovimientosVale, showValeById, getProveedoresValeByNombre } from "../controllers/vales/vales.controller";
@@ -30,6 +30,8 @@ router.post('/findUserRequiByIdAprobadas',authJwt.verifyToken,authJwt.isUsuario,
 router.post('/finalizarEntrega',authJwt.verifyToken,finalizarEntrega)
 router.post('/showRequiByIdDetailsUsuario',authJwt.verifyToken,authJwt.isUsuario,showRequiByIdDetailsUsuario)
 router.post('/getDetailsToEdit',authJwt.verifyToken,authJwt.isUsuario,getDetailsToEdit)
+router.get('/vehiculos',authJwt.verifyToken,authJwt.isUsuario,vehiculos)
+router.get('/plantas',authJwt.verifyToken,authJwt.isUsuario,plantas)
 
 
 
