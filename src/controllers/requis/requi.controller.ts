@@ -31,7 +31,7 @@ export const createRequi=async(req:Request,res:Response):Promise<Response>=>{
       const CC:any = await conn.query('SELECT idCentroCosto from centrocosto where centroCosto = ?',[arr.CentroCosto_idCentroCosto]);
       const idCC = CC[0][0].idCentroCosto;
       await conn.beginTransaction();
-      const requi:any = await conn.query(`INSERT INTO requisiciones(idRequisiciones,fecha,justificacion,Usuarios_idUsuarios,CentroCosto_idCentroCosto,Directores_idDirectores,bienesOServicios,Usuarios_requiriente,estado,gastoCorriente,recursoPropio,recursoOtros,descOtros) values(default,default,?,?,?,?,?,?,?,?,?,?,?)`,[arr.justificacion,decoded.id,idCC,arr.Directores_idDirectores,arr.bienesOServicios,arr.Usuarios_requiriente,arr.estado,arr.gastoCorriente,arr.recursoPropio,arr.recursoOtros,arr.descOtros]);
+      const requi:any = await conn.query(`INSERT INTO requisiciones(idRequisiciones,fecha,justificacion,Usuarios_idUsuarios,CentroCosto_idCentroCosto,Directores_idDirectores,bienesOServicios,Usuarios_requiriente,estado,gastoCorriente,recursoPropio,recursoOtros,descOtros,vehiculo,planta) values(default,default,?,?,?,?,?,?,?,?,?,?,?,?,?)`,[arr.justificacion,decoded.id,idCC,arr.Directores_idDirectores,arr.bienesOServicios,arr.Usuarios_requiriente,arr.estado,arr.gastoCorriente,arr.recursoPropio,arr.recursoOtros,arr.descOtros,arr.placas,arr.plantas]);
 
       //cambiar por select para obtener el id de la requi creada
       const idNuevaRequi = requi[0].insertId;

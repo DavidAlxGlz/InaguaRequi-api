@@ -5,7 +5,7 @@ import {Request,Response} from 'express';
 export const getDirectores =async(req:Request,res:Response):Promise<Response>=>{
   const conn = await connect();
     try {
-        const directores = await conn.query('SELECT * FROM inagua_requis.directores;');
+        const directores = await conn.query('SELECT * FROM inagua_requis.directores where activo = 1;');
         conn.end()
        return res.status(200).json(directores[0])
       } catch (error) {
@@ -66,3 +66,4 @@ export const getDirectores =async(req:Request,res:Response):Promise<Response>=>{
         return res.status(401).json({ message: 'no autorizado' }) 
       }
   }
+

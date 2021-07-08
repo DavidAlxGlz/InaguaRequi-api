@@ -91,8 +91,8 @@ router.post('/showDireccionRequiById',authJwt.isDirector,showRequiDirectorById)
 
 
 //Directores plus
-router.post('/showHistorialById',authJwt.verifyToken,authJwt.isDirector,showHistorialById)
-router.get('/showAllRequis',authJwt.verifyToken,authJwt.isDirectorPlus,showAllRequis)
+router.post('/showHistorialById',authJwt.verifyToken,showHistorialById)
+router.get('/showAllRequis',authJwt.verifyToken,showAllRequis)
 router.post('/showRequiByIdHistorial',authJwt.verifyToken,showRequiByIdHistorial)
 
 
