@@ -12,6 +12,7 @@ import { programarLicitacion } from '../controllers/licitacion/licitacion';
 import { getProveedores, insertProveedor } from '../controllers/proveedores/proveedores';
 import { createPedido, misPedidos, pedidoDetalles, requisicionPedido, showMovimientosByIdPedido } from '../controllers/pedido/pedido';
 import { infoMainDashboard } from '../controllers/charts/main.controller';
+import { solicitantes } from '../controllers/requis/editRequi.controller';
 
 router.post('/signup',signUp);
 router.post('/createRequi',authJwt.verifyToken,authJwt.isUsuario,createRequi)
@@ -121,6 +122,9 @@ router.post('/showMovimientosByIdPedido',authJwt.verifyToken,authJwt.isUsuario,s
 router.post('/createPedido',authJwt.verifyToken,createPedido)
 router.get('/misPedidos',authJwt.verifyToken,misPedidos)
 router.post('/pedidoDetalles',authJwt.verifyToken,pedidoDetalles)
+
+//newRequiEdit
+router.get('/solicitantes',authJwt.verifyToken,solicitantes)
 
 //chart
 router.get('/infoMainDashboard',infoMainDashboard)
