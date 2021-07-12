@@ -12,7 +12,7 @@ import { programarLicitacion } from '../controllers/licitacion/licitacion';
 import { getProveedores, insertProveedor } from '../controllers/proveedores/proveedores';
 import { createPedido, misPedidos, pedidoDetalles, requisicionPedido, showMovimientosByIdPedido } from '../controllers/pedido/pedido';
 import { infoMainDashboard } from '../controllers/charts/main.controller';
-import { solicitantes } from '../controllers/requis/editRequi.controller';
+import { requiToEdit, solicitantes } from '../controllers/requis/editRequi.controller';
 
 router.post('/signup',signUp);
 router.post('/createRequi',authJwt.verifyToken,authJwt.isUsuario,createRequi)
@@ -125,6 +125,7 @@ router.post('/pedidoDetalles',authJwt.verifyToken,pedidoDetalles)
 
 //newRequiEdit
 router.get('/solicitantes',authJwt.verifyToken,solicitantes)
+router.post('/requiToEdit',authJwt.verifyToken,requiToEdit)
 
 //chart
 router.get('/infoMainDashboard',infoMainDashboard)
